@@ -731,7 +731,7 @@ var fingerprint = function() {
       },
       plugins: function() {
         return new Promise(function(resolve) {
-          if (isBrave()) resolve(0);
+          if (isChrome()) resolve(0);
           var plugins = navigator.plugins;
           var output = [];
           if (plugins) {
