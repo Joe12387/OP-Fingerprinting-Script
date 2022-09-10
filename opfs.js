@@ -1,6 +1,11 @@
 "use strict";
 exports.__esModule = true;
 exports.fingerprint = void 0;
+/**
+ *
+ * detectIncognito v1.1.0 - (c) 2022 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/detectIncognito)
+ *
+ **/
 var fingerprint = function () {
     function murmurhash3_32_gc(key, seed) {
         var remainder = key.length & 3;

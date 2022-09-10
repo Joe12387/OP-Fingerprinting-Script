@@ -1,3 +1,8 @@
+/**
+ *
+ * Overpowered Browser Fingerprinting Script v1.0.0b - (c) 2022 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
+ *
+ **/
 export const fingerprint = function() {
     function murmurhash3_32_gc(key: any, seed: number) {
       let remainder = key.length & 3;
