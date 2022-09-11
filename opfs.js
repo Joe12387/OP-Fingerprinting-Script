@@ -706,18 +706,16 @@ const fingerprint = function () {
             // console.log(exe);
             promises.push(exe);
         }
-        return new Promise(function (resolve, reject) {
-            Promise.all(promises).then((k) => {
-                let profile = {};
-                for (let i = 0; i < index.length; i++) {
-                    profile[index[i]] = k[i];
-                }
-                let output = { profile: profile, fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420) };
-                console.log(output);
-                resolve(output);
-            }).catch((err) => {
-                console.log(err);
-            });
+        Promise.all(promises).then((k) => {
+            let profile = {};
+            for (let i = 0; i < index.length; i++) {
+                profile[index[i]] = k[i];
+            }
+            let output = { profile: profile, fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420) };
+            console.log(output);
+            resolve(output);
+        }).catch((err) => {
+            console.log(err);
         });
     });
 };

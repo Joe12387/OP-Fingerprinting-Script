@@ -269,7 +269,7 @@ export const fingerprint = function() {
   
             context = new(context)(1, 44100, 44100) as any;
 
-            console.log(context);
+            // console.log(context);
   
             let pxi_oscillator = (context as any).createOscillator();
             pxi_oscillator.type = "triangle";
@@ -785,18 +785,16 @@ export const fingerprint = function() {
         promises.push(exe);
       }
       
-      return new Promise(function(resolve, reject) {
         Promise.all(promises).then((k) => {
           let profile = {} as any;
           for (let i = 0; i < index.length; i++) {
             profile[index[i]] = k[i];
           }
           let output = {profile: profile, fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420)};
-          console.log(output);
+          // console.log(output);
           resolve(output);
         }).catch((err) => {
           console.log(err);
         });
       });
-    });
   };
