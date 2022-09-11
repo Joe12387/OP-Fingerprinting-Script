@@ -56,6 +56,7 @@
  * webglProgram
  * fonts
  * plugins
+ * sharedArrayBuffer
  
  ## TODO: Unimplemented Fingerprinting Methods
  * DOMRect
