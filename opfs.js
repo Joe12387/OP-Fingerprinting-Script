@@ -66,7 +66,7 @@ const fingerprint = function () {
     function isBrave() {
         return isChrome() && navigator.brave !== undefined;
     }
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
         var fingerprints = {
             platform: function () {
                 return Promise.resolve(navigator.platform || -1);
@@ -232,10 +232,12 @@ const fingerprint = function () {
             },
             jsHeapSizeLimit: function () {
                 return new Promise(function (resolve) {
-                    var perf, memory, jsHeapSizeLimit;
-                    if ((perf = window.performance) != undefined) {
-                        if ((memory = perf.memory) != undefined) {
-                            if ((jsHeapSizeLimit = memory.jsHeapSizeLimit) != undefined) {
+                    let perf = window.performance;
+                    if (perf !== undefined) {
+                        let memory = perf.memory;
+                        if (memory !== undefined) {
+                            let jsHeapSizeLimit = memory.jsHeapSizeLimit;
+                            if (jsHeapSizeLimit !== undefined) {
                                 resolve(jsHeapSizeLimit);
                             }
                         }
@@ -251,7 +253,7 @@ const fingerprint = function () {
                     if (typeof context !== "function")
                         resolve(-1);
                     context = new (context)(1, 44100, 44100);
-                    console.log(context);
+                    // console.log(context);
                     let pxi_oscillator = context.createOscillator();
                     pxi_oscillator.type = "triangle";
                     pxi_oscillator.frequency.value = 1e4;
@@ -304,29 +306,32 @@ const fingerprint = function () {
                 return new Promise(function (resolve) {
                     if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave())
                         resolve(0);
-                    var asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
+                    const asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
                     function canvas_geometry(ctx) {
                         ctx.globalCompositeOperation = "multiply";
-                        var a = [
+                        let a = [
                             ["#f0f", 100, 50],
                             ["#0ff", 50, 50],
                             ["#ff0", 75, 100]
                         ];
-                        for (var o = 0; o < a.length; o++) {
-                            var u = a[o], s = u[0], c = u[1], l = u[2];
+                        for (let o = 0; o < a.length; o++) {
+                            let u = a[o];
+                            let s = u[0];
+                            let c = u[1];
+                            let l = u[2];
                             ctx.fillStyle = s;
                             ctx.beginPath();
                             ctx.arc(c, l, 50, 0, 2 * Math.PI, !0);
                             ctx.closePath();
                             ctx.fill();
                         }
-                        var r = [
+                        let r = [
                             ["#f2f", 190, 40],
                             ["#2ff", 230, 40],
                             ["#ff2", 210, 80]
                         ];
-                        for (var n = 0; n < r.length; n++) {
-                            var i = r[n];
+                        for (let n = 0; n < r.length; n++) {
+                            let i = r[n];
                             ctx.fillStyle = i[0];
                             ctx.beginPath();
                             ctx.arc(i[1], i[2], 40, 0, 2 * Math.PI, !0);
@@ -350,35 +355,35 @@ const fingerprint = function () {
                         ctx.fillText(asciiString, 2, 15);
                         ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
                         ctx.fillText(asciiString, 4, 17);
-                        var fonts = ["Times New Roman", "Times", "Georgia", "Palatino", "Garamond", "Bookman", "Comic Sans MS", "Trebuchet MS", "Helvetica", "Baskerville", "Akzidenz Grotesk", "Gotham", "Bodoni", "Didot", "Futura", "Gill Sans", "Frutiger", "Apple Color Emoji", "MS Gothic", "fakefont"];
-                        var colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
-                        for (var i = 0; i < fonts.length; i++) {
+                        const fonts = ["Times New Roman", "Times", "Georgia", "Palatino", "Garamond", "Bookman", "Comic Sans MS", "Trebuchet MS", "Helvetica", "Baskerville", "Akzidenz Grotesk", "Gotham", "Bodoni", "Didot", "Futura", "Gill Sans", "Frutiger", "Apple Color Emoji", "MS Gothic", "fakefont"];
+                        const colors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+                        for (let i = 0; i < fonts.length; i++) {
                             ctx.font = "12px " + fonts[i];
                             ctx.strokeStyle = colors[i % colors.length];
                             ctx.lineWidth = 2;
                             ctx.strokeText(asciiString, 10 * (Math.ceil(i / 13) * 2) - 10, 30 + ((i + 1) * 10 % 130));
                         }
-                        var grd = ctx.createLinearGradient(0, 0, 200, 0.2);
+                        let grd = ctx.createLinearGradient(0, 0, 200, 0.2);
                         grd.addColorStop(0, "rgba(102, 204, 0, 0.1)");
                         grd.addColorStop(1, "#FF0000");
                         ctx.fillStyle = grd;
                         ctx.fillRect(10, 10, 175, 100);
                         return !ctx.isPointInPath(5, 5, "evenodd");
                     }
-                    var canvas = document.createElement('canvas');
-                    var ctx = canvas.getContext('2d');
+                    let canvas = document.createElement('canvas');
+                    let ctx = canvas.getContext('2d');
                     canvas.width = 300;
                     canvas.height = 150;
-                    var geometry_winding = canvas_geometry(ctx);
-                    var canvas_geometry_fp = murmurhash3_32_gc(canvas.toDataURL(), 420);
-                    var combined_winding = canvas_text(ctx);
-                    var canvas_combined_fp = murmurhash3_32_gc(canvas.toDataURL(), 420);
+                    let geometry_winding = canvas_geometry(ctx);
+                    let canvas_geometry_fp = murmurhash3_32_gc(canvas.toDataURL(), 420);
+                    let combined_winding = canvas_text(ctx);
+                    let canvas_combined_fp = murmurhash3_32_gc(canvas.toDataURL(), 420);
                     canvas = document.createElement('canvas');
                     ctx = canvas.getContext('2d');
                     canvas.width = 300;
                     canvas.height = 150;
-                    var text_winding = canvas_text(ctx);
-                    var canvas_text_fp = murmurhash3_32_gc(canvas.toDataURL(), 420);
+                    let text_winding = canvas_text(ctx);
+                    let canvas_text_fp = murmurhash3_32_gc(canvas.toDataURL(), 420);
                     resolve({
                         "geometry": {
                             "hash": canvas_geometry_fp,
@@ -434,7 +439,7 @@ const fingerprint = function () {
                     function populateVoiceList() {
                         let voices = synth.getVoices();
                         let output = [];
-                        for (var i = 0; i < voices.length; i++) {
+                        for (let i = 0; i < voices.length; i++) {
                             let voice = voices[i];
                             output.push([voice.name, voice.voiceURI, voice.default, voice.lang, voice.localService]);
                         }
@@ -451,11 +456,11 @@ const fingerprint = function () {
             },
             applePay: function () {
                 return new Promise(function (resolve) {
-                    var ap = window.ApplePaySession;
+                    let ap = window.ApplePaySession;
                     if (typeof ap !== "function")
-                        resolve(-1);
-                    var enabled = ap.canMakePayments();
-                    resolve(enabled);
+                        resolve([-1, null]);
+                    let enabled = ap.canMakePayments();
+                    resolve([0, enabled]);
                 });
             },
             attributionsourceid: function () {
@@ -584,9 +589,9 @@ const fingerprint = function () {
                         resolve(-2);
                     }
                     context.clearColor(0, 0, 1, 1);
-                    var program = context.createProgram();
+                    let program = context.createProgram();
                     function helper(x, y) {
-                        var shader = context.createShader(35633 - x);
+                        let shader = context.createShader(35633 - x);
                         context.shaderSource(shader, y);
                         context.compileShader(shader);
                         context.attachShader(program, shader);
@@ -596,8 +601,8 @@ const fingerprint = function () {
                     context.linkProgram(program);
                     context.useProgram(program);
                     context.enableVertexAttribArray(0);
-                    var uniform = context.getUniformLocation(program, 't');
-                    var buffer = context.createBuffer();
+                    let uniform = context.getUniformLocation(program, 't');
+                    let buffer = context.createBuffer();
                     context.bindBuffer(34962, buffer);
                     context.bufferData(34962, new Float32Array([0, 1, -1, -1, 1, -1]), 35044);
                     context.vertexAttribPointer(0, 2, 5126, false, 0, 0);
@@ -609,6 +614,8 @@ const fingerprint = function () {
             },
             fonts: function () {
                 return new Promise(function (resolve) {
+                    if (isBrave())
+                        return 0;
                     const fontMode = (isSafari() && !isFirefox()) || isMSIE();
                     const fontList = fontMode ? ["fakefont", "Apple Color Emoji", "sans-serif-thin", "ARNO PRO", "Agency FB", "Arabic Typesetting", "Arial Unicode MS", "AvantGarde Bk BT", "BankGothic Md BT", "Batang", "Bitstream Vera Sans Mono", "Calibri", "Century", "Century Gothic", "Clarendon", "EUROSTILE", "Franklin Gothic", "Futura Bk BT", "Futura Md BT", "GOTHAM", "Gill Sans", "HELV", "Haettenschweiler", "Helvetica Neue", "Humanst521 BT", "Leelawadee", "Letter Gothic", "Levenim MT", "Lucida Bright", "Lucida Sans", "Menlo", "MS Mincho", "MS Outlook", "MS Reference Specialty", "MS UI Gothic", "MT Extra", "MYRIAD PRO", "Marlett", "Meiryo UI", "Microsoft Uighur", "Minion Pro", "Monotype Corsiva", "PMingLiU", "Pristina", "SCRIPTINA", "Segoe UI Light", "Serifa", "SimHei", "Small Fonts", "Staccato222 BT", "TRAJAN PRO", "Univers CE 55 Medium", "Vrinda", "ZWAdobeF", "Bauhaus 93", "FORTE", "Book Antiqua", "Liberation Sans", "Liberation Serif", "Liberation Mono", "Liberation Sans Narrow", "Droid Naskh Shift", "Droid Naskh Shift Alt", "Droid Naskh System UI", "Droid Naskh UI", "Droid Robot Regular", "Droid Sans", "Droid Sans Fallback", "Droid Sans Hebrew", "Droid Sans Japanese", "Droid Sans Mono", "Droid Sans Thai", "Droid Serif", "DroidSansFallback", "Noto Naskh Arabic", "Ubuntu Mono derivative Powerline", "Ubuntu Mono derivative Powerline Bold", "Ubuntu Mono derivative Powerline Bold Italic", "Ubuntu Mono derivative Powerline Italic", "Adobe Caslon", "Adobe Caslon Pro", "Adobe Caslon Pro Bold", "Adobe Devanagari", "Adobe Fan Heiti Std B", "Adobe Fangsong Std", "Adobe Fangsong Std R", "Adobe Garamond", "Adobe Garamond Pro", "Adobe Garamond Pro Bold", "Adobe Gothic Std", "Adobe Gothic Std B", "Adobe Hebrew", "Adobe Heiti Std R", "Adobe Jenson", "Adobe Kaiti Std R", "Adobe Ming Std L", "Adobe Myungjo Std M", "Adobe Naskh Medium", "Adobe Song Std L", "Orator Std Slanted", "Poplar Std", "Prestige Elite Std Bd", "Rosewood Std Regular", "Giddyup Std", "Hobo Std", "Hobo Std Medium", "Birch Std", "Blackoak Std", "TeamViewer13", "TeamViewer14", "TeamViewer15", "TeamViewer16"] : ["fakefont", "TeamViewer10", "TeamViewer11", "TeamViewer12", "TeamViewer13", "TeamViewer7", "TeamViewer8", "TeamViewer9", ".Mondulkiri U GR 1.5", "AIGDT", "AMGDT", "Abel", "Aboriginal Sans", "Aboriginal Serif", "Abyssinica SIL", "AcadEref", "Acumin", "Adobe Arabic", "Adobe Caslon", "Adobe Caslon Pro", "Adobe Caslon Pro Bold", "Adobe Devanagari", "Adobe Fan Heiti Std B", "Adobe Fangsong Std", "Adobe Fangsong Std R", "Adobe Garamond", "Adobe Garamond Pro", "Adobe Garamond Pro Bold", "Adobe Gothic Std", "Adobe Gothic Std B", "Adobe Hebrew", "Adobe Heiti Std R", "Adobe Jenson", "Adobe Kaiti Std R", "Adobe Ming Std L", "Adobe Myungjo Std M", "Adobe Naskh Medium", "Adobe Song Std L", "Agency FB", "Aharoni", "Akaash", "Akshar Unicode", "AksharUnicode", "Al Bayan", "Alexandra Script", "Algerian", "Amadeus", "AmdtSymbols", "AnastasiaScript", "Andale Mono", "Andalus", "Angsana New", "AngsanaUPC", "AnjaliOldLipi", "Annabelle", "Aparajita", "Apple Casual", "Apple Chancery", "Apple Color Emoji", "Apple SD Gothic Neo", "AppleGothic", "AppleMyungjo", "Arabic Transparent", "Arabic Typesetting", "Arial", "Arial AMU", "Arial Baltic", "Arial Black", "Arial CE", "Arial CYR", "Arial Cyr", "Arial Greek", "Arial Hebrew", "Arial MT", "Arial Narrow", "Arial Rounded MT Bold", "Arial TUR", "Arial Unicode MS", "Ariston", "Arno Pro", "Arno Pro Caption", "Arno Pro Display", "Arno Pro Light Display", "Arno Pro SmText", "Arno Pro Smbd", "Arno Pro Smbd Caption", "Arno Pro Smbd Display", "Arno Pro Smbd SmText", "Arno Pro Smbd Subhead", "Arno Pro Subhead", "Asana Math", "Ayuthaya", "BJCree Uni", "BPG Classic 99U", "BPG Paata Khutsuri U", "Bangla MN", "Bangla Sangam MN", "BankGothic Lt BT", "BankGothic Md BT", "Baskerville Old Face", "Batang", "BatangChe", "Bauhaus 93", "Bell Gothic Std Black", "Bell Gothic Std Light", "Bell MT", "Berlin Sans FB", "Berlin Sans FB Demi", "Bernard MT Condensed", "Bickham Script One", "Bickham Script Pro Regular", "Bickham Script Pro Semibold", "Bickham Script Two", "Birch Std", "Bitstream Vera Sans Mono", "Blackadder ITC", "Blackoak Std", "Bernard Condensed", "Bodoni MT", "Bodoni MT Black", "Bodoni MT Condensed", "Bodoni MT Poster Compressed", "Book Antiqua", "Bookman Old Style", "Bookshelf Symbol 7", "Bradley Hand ITC", "Britannic Bold", "Broadway", "Browallia New", "BrowalliaUPC", "Brush Script MT", "Brush Script Std", "CDT Khmer", "Calibri", "Calibri Light", "Californian FB", "Calisto MT", "Calligraph", "Cambria", "Cambria Math", "Candara", "Carolina", "Castellar", "Centaur", "Century", "Century Gothic", "Century Schoolbook", "Ceremonious Two", "Chaparral Pro", "Chaparral Pro Light", "Charcoal CY", "Charis SIL Compact", "Charlemagne Std", "Chiller", "CityBlueprint", "Clarendon BT", "Clarendon Blk BT", "Clarendon Lt BT", "Clear Sans", "Code2000", "Colonna MT", "Comic Sans", "Comic Sans MS", "CommercialPi BT", "CommercialScript BT", "Complex", "Consolas", "Constantia", "Cooper Black", "Cooper Std Black", "Copperplate Gothic Bold", "Copperplate Gothic Light", "Copyist", "Corbel", "Cordia New", "CordiaUPC", "CountryBlueprint", "Courier", "Courier New", "Courier New Baltic", "Courier New CE", "Courier New CYR", "Courier New Cyr", "Courier New Greek", "Courier New TUR", "Curlz MT", "DFKai-SB", "DaunPenh", "David", "DecoType Naskh", "Decor", "DejaVu Math TeX Gyre", "DejaVu Sans", "DejaVu Sans Condensed", "DejaVu Sans Light", "DejaVu Sans Mono", "DejaVu Serif", "DejaVu Serif Condensed", "Devanagari MT", "Devanagari Sangam MN", "DilleniaUPC", "DokChampa", "Dotum", "DotumChe", "Droid Naskh Shift", "Droid Naskh Shift Alt", "Droid Naskh System UI", "Droid Naskh UI", "Droid Robot Regular", "Droid Sans", "Droid Sans Fallback", "Droid Sans Hebrew", "Droid Sans Japanese", "Droid Sans Mono", "Droid Sans Thai", "Droid Serif", "DroidSansFallback", "Dutch801 Rm BT", "Dutch801 XBd BT", "Ebrima", "Eccentric Std", "Edwardian Script ITC", "Ekushey Punarbhaba", "Elephant", "Engravers MT", "Eras Bold ITC", "Eras Demi ITC", "Eras Light ITC", "Eras Medium ITC", "Estrangelo Edessa", "Ethiopia Jiret", "EucrosiaUPC", "Euphemia", "Euphemia UCAS", "EuroRoman", "Eurostile", "FTEasci1", "FTEasci1-f", "FTEasci2", "FTEasci2-f", "FTEbaudo", "FTEbaudo-f", "FTEebcd1", "FTEebcd1-f", "FTEebcd2", "FTEebcd2-f", "FTEspec", "FTEspec-f", "FangSong", "Felix Titling", "Fira Code", "Fira Mono", "Fira Sans", "Fixed Miriam Transparent", "Fixedsys", "Footlight MT Light", "Forte", "FrankRuehl", "Franklin Gothic Book", "Franklin Gothic Demi", "Franklin Gothic Demi Cond", "Franklin Gothic Heavy", "Franklin Gothic Medium", "Franklin Gothic Medium Cond", "Freehand521 BT", "FreesiaUPC", "Freestyle Script", "French Script MT", "Futura Md BT", "GDT", "GENISO", "GF Zemen Unicode", "Gabriola", "Gadugi", "Garamond", "Garamond Premr Pro", "Garamond Premr Pro Smbd", "Gautami", "Geeza Pro", "Geneva", "Gentium Basic", "Gentium Book Basic", "Georgia", "Giddyup Std", "Gigi", "Gill Sans MT", "Gill Sans MT Condensed", "Gill Sans MT Ext Condensed Bold", "Gill Sans Ultra Bold", "Gill Sans Ultra Bold Condensed", "Gisha", "Gloucester MT Extra Condensed", "GothicE", "GothicG", "GothicI", "Goudy Old Style", "Goudy Stout", "GreekC", "GreekS", "Gujarati MT", "Gujarati Sangam MN", "Gulim", "GulimChe", "Gungsuh", "GungsuhChe", "Gurmukhi MT", "Guttman Yad", "HYSerif", "Haettenschweiler", "Harlow Solid Italic", "Harrington", "Heather Script One", "Heiti SC", "Heiti TC", "Helvetica", "Helvetica Neue", "High Tower Text", "Hiragino Kaku Gothic Pro", "Hiragino Kaku Gothic ProN", "Hiragino Mincho Pro", "Hiragino Mincho ProN", "Hobo Std", "Hoefler Text", "ISOCP", "ISOCP2", "ISOCP3", "ISOCPEUR", "ISOCT", "ISOCT2", "ISOCT3", "ISOCTEUR", "Impact", "Imprint MT Shadow", "InaiMathi", "Informal Roman", "IrisUPC", "Iskoola Pota", "Italic", "ItalicC", "ItalicT", "JasmineUPC", "Jokerman", "Jomolhari", "Juice ITC", "KaiTi", "KaiTi_GB2312", "Kailasa", "Kaiti SC", "Kaiti TC", "Kalinga", "Kannada MN", "Kannada Sangam MN", "Kartika", "Kedage", "Kefa", "Kh-SrokKhleang", "Khmer MN", "Khmer OS", "Khmer OS Fasthand", "Khmer OS Freehand", "Khmer OS Metal Chrieng", "Khmer OS Muol", "Khmer OS System", "Khmer Sangam MN", "Khmer UI", "KodchiangUPC", "Kokila", "Kozuka Gothic Pr6N B", "Kozuka Gothic Pr6N EL", "Kozuka Gothic Pr6N H", "Kozuka Gothic Pr6N L", "Kozuka Gothic Pr6N M", "Kozuka Gothic Pr6N R", "Kozuka Gothic Pro B", "Kozuka Gothic Pro EL", "Kozuka Gothic Pro H", "Kozuka Gothic Pro L", "Kozuka Gothic Pro M", "Kozuka Gothic Pro R", "Kozuka Mincho Pr6N B", "Kozuka Mincho Pr6N EL", "Kozuka Mincho Pr6N H", "Kozuka Mincho Pr6N L", "Kozuka Mincho Pr6N M", "Kozuka Mincho Pr6N R", "Kozuka Mincho Pro B", "Kozuka Mincho Pro EL", "Kozuka Mincho Pro H", "Kozuka Mincho Pro L", "Kozuka Mincho Pro M", "Kozuka Mincho Pro R", "Kristen ITC", "Ktav", "KufiStandardGK", "Kunstler Script", "LUCIDA GRANDE", "Lao UI", "Latha", "Latin Modern Math", "Leelawadee", "Letter Gothic Std", "Levenim MT", "LiHei Pro", "LiSong Pro", "Liberation Sans", "Liberation Serfi", "Liberation Mono", "Liberation Sans Narrow", "Libertinus Math", "Likhan", "LilyUPC", "Lithos Pro Regular", "Lucida Bright", "Lucida Calligraphy", "Lucida Console", "Lucida Fax", "Lucida Grande", "Lucida Handwriting", "Lucida Sans", "Lucida Sans Typewriter", "Lucida Sans Unicode", "MS Gothic", "MS Mincho", "MS Outlook", "MS PGothic", "MS PMincho", "MS Reference Sans Serif", "MS Reference Specialty", "MS Sans Serif", "MS Serif", "fakefont2", "MS Song", "MS UI Gothic", "MT Extra", "MV Boli", "MYRIAD", "MYRIAD PRO", "Magneto", "Maiandra GD", "Malayalam MN", "Malayalam Sangam MN", "Malgun Gothic", "Mangal", "Marlett", "Matura MT Script Capitals", "Meiryo", "Meiryo UI", "Mesquite Std", "Microsoft Himalaya", "Microsoft JhengHei", "Microsoft JhengHei UI", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Sans Serif", "Microsoft Tai Le", "Microsoft Uighur", "Microsoft YaHei", "Microsoft YaHei UI", "Microsoft Yi Baiti", "Ming(for ISO10646)", "MingLiU", "MingLiU-ExtB", "MingLiU_HKSCS", "MingLiU_HKSCS-ExtB", "MingLiu_HKSCS", "Minion Pro", "Minion Pro Cond", "Minion Pro Med", "Minion Pro SmBd", "Miriam", "Miriam Fixed", "Mistral", "Mitra Mono", "Modern", "Modern No. 20", "Monaco", "Mongolian Baiti", "Monospac821 BT", "Monotxt", "Monotype Corsiva", "MoolBoran", "MotoyaLCedar", "MotoyaLMaru", "Mshtakan", "Mukti Narrow", "Myriad Arabic", "Myriad Hebrew", "Myriad Pro", "Myriad Pro Cond", "Myriad Pro Light", "Myriad Web Pro", "NSimSun", "NanumGothic", "Narkisim", "Niagara Engraved", "Niagara Solid", "Nirmala UI", "Noto Mono", "Noto Color Emoji", "Noto Emoji", "Noto Kufi Arabic ", "Noto Naskh Arabic", "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Noto Sans JP", "Noto Sans KR", "Noto Sans Mono CJK JP", "Noto Sans Lao ", "Noto Sans Mono CJK KR", "Noto Sans Mono CJK SC", "Noto Sans Mono CJK TC", "Noto Sans SC", "Noto Sans TC", "Noto Serif", "Noto Serif CJK JP", "Noto Serif CJK KR", "Noto Serif CJK SC", "Noto Serif CJK TC", "Noto Serif Ahom", "Nueva Std", "Nueva Std Cond", "Nyala", "OCR A Extended", "OCR A Std", "OCR-A BT", "OCR-B 10 BT", "Old English Text MT", "Onyx", "OpenSymbol", "Orator Std", "Orator Std Slanted", "Oriya MN", "Oriya Sangam MN", "Osaka-Mono", "OskiDakelh", "Ouverture script", "PMingLiU", "PMingLiU-ExtB", "PMingLiu", "Palace Script MT", "Palatino", "Palatino Linotype", "PanRoman", "Papyrus", "Parchment", "Perpetua", "Perpetua Titling MT", "PhnomPenh OT", "Pigiarniq", "PingFang SC", "PingFang TC", "Plantagenet Cherokee", "Playbill", "Poor Richard", "Poplar Std", "Pothana", "Power Clear", "Power Green", "Power Green Narrow", "Power Green Small", "Power Red and Blue", "Power Red and Blue Intl", "Power Red and Green", "Prestige Elite Std", "Prestige Elite Std Bd", "Pristina", "Proxy 1", "Proxy 2", "Proxy 3", "Proxy 4", "Proxy 5", "Proxy 6", "Proxy 7", "Proxy 8", "Proxy 9", "Raavi", "Rachana_w01", "Rage Italic", "Raghindi", "Ravie", "Roboto", "Roboto Slab", "Roboto Mono", "Rockwell", "Rockwell Condensed", "Rockwell Extra Bold", "Rod", "Roman", "RomanC", "RomanD", "RomanS", "RomanT", "Romantic", "Rosewood Std Regular", "STHeiti", "STIX Math", "STIX Two Math", "STIXGeneral", "STSong", "Saab", "Sakkal Majalla", "San Francisco", "SansSerif", "Script", "Script MT Bold", "ScriptC", "ScriptS", "Segoe Print", "Segoe Script", "Segoe UI", "Segoe UI Emoji", "Segoe UI Light", "Segoe UI Semibold", "Segoe UI Semilight", "Segoe UI Symbol", "Shonar Bangla", "Showcard Gothic", "Shruti", "SimHei", "SimSun", "SimSun-ExtB", "Simplex", "Simplified Arabic", "Simplified Arabic Fixed", "Sinhala MN", "Sinhala Sangam MN", "Skype UI Symbol", "Small Fonts", "SmartGothic", "Snap ITC", "Songti SC", "Songti TC", "Square721 BT", "Stencil", "Stencil Std", "Stylus BT", "Sun-ExtA", "SuperFrench", "Swis721 BT", "Swis721 BdCnOul BT", "Swis721 BdOul BT", "Swis721 Blk BT", "Swis721 BlkCn BT", "Swis721 BlkEx BT", "Swis721 BlkOul BT", "Swis721 Cn BT", "Swis721 Ex BT", "Swis721 Hv BT", "Swis721 Lt BT", "Swis721 LtCn BT", "Swis721 LtEx BT", "Syastro", "Sylfaen", "Symap", "Symath", "Symbol", "Symeteo", "Symusic", "System", "TITUS Cyberbit Basic", "Tahoma", "TeX Gyre Bonum Math", "TeX Gyre Pagella Math", "TeX Gyre Schola", "TeX Gyre Termes Math", "Technic", "TechnicBold", "TechnicLite", "Tekton Pro", "Tekton Pro Cond", "Tekton Pro Ext", "Telugu MN", "Telugu Sangam MN", "Tempus Sans ITC", "Terminal", "Thonburi", "ThoolikaUnicode", "Tibetan Machine Uni", "Times", "Times New Roman", "Times New Roman Baltic", "Times New Roman CE", "Times New Roman CYR", "Times New Roman Cyr", "Times New Roman Greek", "Times New Roman PS", "Times New Roman TUR", "Traditional Arabic", "Trajan Pro", "Trebuchet MS", "Tunga", "Tw Cen MT", "Tw Cen MT Condensed", "Tw Cen MT Condensed Extra Bold", "Twemoji Mozilla", "Txt", "Ubuntu", "Ubuntu Light", "Ubuntu Bold", "Ubuntu Mono", "UniversalMath1 BT", "Uqammaq", "Utsaah", "VL Gothic", "VL PGothic", "Vani", "Verdana", "Vijaya", "Viner Hand ITC", "Vineta BT", "Visual Geez Unicode", "Visual Geez Unicode Agazian", "Visual Geez Unicode Title", "Vivaldi", "Vladimir Script", "Vrinda", "WP Arabic Sihafa", "WP ArabicScript Sihafa", "WP CyrillicA", "WP CyrillicB", "WP Greek Century", "WP Greek Courier", "WP Greek Helve", "WP Hebrew David", "WP MultinationalA Courier", "WP MultinationalA Helve", "WP MultinationalA Roman", "WP MultinationalB Courier", "WP MultinationalB Helve", "WP MultinationalB Roman", "WST_Czec", "WST_Engl", "WST_Fren", "WST_Germ", "WST_Ital", "WST_Span", "WST_Swed", "Webdings", "Wide Latin", "Wingdings", "Wingdings 2", "Wingdings 3", "XITS Math", "Yu Gothic", "Yu Mincho", "ZWAdobeF", "Zuzumbo", "cursive", "fantasy", "monospace", "ori1Uni", "sans-serif", "serif"];
                     let list = [];
@@ -694,6 +701,17 @@ const fingerprint = function () {
                     }
                     resolve([-1, null]);
                 });
+            },
+            webdriver: () => {
+                return new Promise((resolve) => {
+                    let webd = navigator.webdriver;
+                    if (webd == null) {
+                        resolve([-1, webd]);
+                    }
+                    else {
+                        resolve([0, webd]);
+                    }
+                });
             }
         };
         // console.log(fingerprints.speechSynthesis());
@@ -711,11 +729,15 @@ const fingerprint = function () {
             for (let i = 0; i < index.length; i++) {
                 profile[index[i]] = k[i];
             }
-            let output = { profile: profile, fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420) };
-            console.log(output);
+            let output = {
+                profile: profile,
+                fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420)
+            };
+            // console.log(output);
             resolve(output);
         }).catch((err) => {
             console.log(err);
+            reject(err);
         });
     });
 };

@@ -8,9 +8,10 @@
       var exports = {};
       function init() {
         var fpPromise = fingerprint();
-        console.log(fpPromise);
+        // console.log(fpPromise);
         fpPromise.then((output) => {
-          console.log(output);
+          // console.log(output);
+          document.write("FP: " + output.fingerprint + "\n<br>\n<code>" + JSON.stringify(output.profile, null, 4).replace(/\n/g, "<br>").replace(/\x20/g, "&nbsp;"));
         }).catch((err) => {
           console.log(err);
         });
