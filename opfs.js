@@ -665,8 +665,8 @@ const fingerprint = function () {
                 return new Promise(function (resolve) {
                     if (isChrome())
                         resolve(0);
-                    var plugins = navigator.plugins;
-                    var output = [];
+                    let plugins = navigator.plugins;
+                    let output = [];
                     if (plugins) {
                         for (var i = 0; i < plugins.length; i++) {
                             var plugin = plugins[i];
@@ -719,9 +719,9 @@ const fingerprint = function () {
         let promises = [];
         for (let method in fingerprints) {
             index.push(method);
-            // console.log(method);
+            console.log(method);
             let exe = fingerprints[method]();
-            // console.log(exe);
+            console.log(exe);
             promises.push(exe);
         }
         Promise.all(promises).then((k) => {
