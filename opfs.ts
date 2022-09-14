@@ -71,6 +71,18 @@
     return document.documentElement !== undefined && (document.documentElement as any).style.MozAppearance !== undefined;
   }
 
+  function isFirefoxResistFingerprinting() {
+    if (!isFirefox()) return false;
+
+    const intl = window.Intl;
+    const date = intl.DateTimeFormat;
+    if (typeof date === "function") {
+      const tz = (new date).resolvedOptions().timeZone;
+      if (tz === "UTC") return true;
+    }
+    return false;
+  }
+
   function isMSIE() {
     return (navigator as any).msSaveBlob !== undefined;
   }
@@ -104,7 +116,7 @@
         return Promise.resolve((navigator as any).cpuClass || -1);
       },
       hardwareConcurrency: function() {
-        return Promise.resolve((isBrave() ? 0 : navigator.hardwareConcurrency) || -1);
+        return Promise.resolve((isBrave() || isFirefox() ? 0 : navigator.hardwareConcurrency) || -1);
       },
       deviceMemory: function() {
         return Promise.resolve((isBrave() ? 0 : (navigator as any).deviceMemory) || -1);
@@ -217,11 +229,11 @@
           const date = intl.DateTimeFormat;
           if (typeof date === "function") {
             const tz = (new date).resolvedOptions().timeZone;
-            if (tz) resolve(tz);
+            if (tz) resolve([0, tz]);
           }
           const year = (new Date).getFullYear();
           const utc = -Math.max(parseFloat(new Date(year, 0, 1).getTimezoneOffset()), parseFloat(new Date(year, 6, 1).getTimezoneOffset()));
-          resolve("UTC" + (utc >= 0 ? "+" : "-") + Math.abs(utc));
+          resolve([1, "UTC" + (utc >= 0 ? "+" : "-") + Math.abs(utc)]);
         });
       },
       timezoneOffset: function() {
@@ -244,7 +256,8 @@
         });
       },
       screenResolution: function() {
-        return Promise.resolve([screen.width, screen.height].sort().reverse().join("x"));
+        if (isFirefoxResistFingerprinting()) return [-1, null];
+        return Promise.resolve([0, [screen.width, screen.height].sort().reverse().join("x")]);
       },
       jsHeapSizeLimit: function() {
         return new Promise(function(resolve) {
@@ -325,7 +338,7 @@
       },
       canvasAPI: function() {
         return new Promise(function(resolve) {
-          if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave()) resolve(0);
+          if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() || isFirefoxResistFingerprinting()) resolve(0);
 
           const asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
 
@@ -472,7 +485,7 @@
       },
       speechSynthesis: function() {
         return new Promise(function(resolve) {
-          if (isBrave()) resolve(0);
+          if (isBrave() || isFirefox()) resolve(0);
 
           let tripped = false;
           let synth = window.speechSynthesis;
