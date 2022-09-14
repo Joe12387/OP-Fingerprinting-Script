@@ -736,9 +736,6 @@ const fingerprint = function () {
                         resolve([-2, null]);
                     resolve([0, de.getAttributeNames()]);
                 });
-            },
-            navigator: () => {
-                return Promise.resolve(Object.getOwnPropertyNames(Object.getPrototypeOf(window.navigator)));
             }
         };
         // console.log(fingerprints.speechSynthesis());
