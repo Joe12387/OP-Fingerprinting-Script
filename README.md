@@ -1,6 +1,8 @@
 # OP JavaScript Browser Fingerprinting Script
  OPFS is a novel, overpowered browser fingerprinting library coded in JavaScript for creating persistent, unique and long-lasting fingerprints without depending on ever-changing variables such as the user agent string commonly used in other browser fingerprinting libraries. As such, the fingerprint does not change most of the time when a user upgrades their browser to the current version.
 
+[DEMO](https://detectincognito.com/opfs.html "DEMO")
+
 ## Overpowered?
  OPFS uses some novel methods not well known before the publishing of this repo that allow the creation of a likely completely unique device fingerprint in Mozilla Firefox, Google Chrome, Microsoft Edge and other Chromium-based browsers such as Opera and Brave.
  
@@ -18,6 +20,13 @@
  * jsHeapSizeLimit: the value of performance.memory.jsHeapSizeLimit in Chrome (7.2x more unique than CanvasAPI)
  * performance.now(): A previously unpublished method of using performance.now() to create a unique value (6.1x more unique than CanvasAPI)
  * speechSynthesis: A method of enumerating all synthetic voices available to the browser into a fingerprint.
+ 
+ ## Expected Behavior
+ * The fingerprint should not change between page loads or if the browser is restarted.
+ * The fingerprint should not change if the user is in incognito or private mode.
+ * The fingerprint should not change if the network or IP address changes.
+
+ If you are aware of a way to violate any of the three expected behaviors above, please create an issue.
  
  ## Implemented Fingerprinting Methods
  * platform
