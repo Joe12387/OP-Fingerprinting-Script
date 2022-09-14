@@ -470,7 +470,7 @@
 
           const perf = window.performance;
 
-          if (typeof perf === undefined) resolve([-2, null]);
+          if (perf === undefined) resolve([-2, null]);
           if (typeof perf.now !== "function") resolve([-3, null]);
 
           let valueA = 1;
