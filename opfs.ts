@@ -793,6 +793,14 @@
             resolve([0, webd]);
           }
         });
+      },
+      getAttributeNames: () => {
+        return new Promise((resolve) => {
+          let de = document.documentElement;
+          if (de === undefined) resolve([-1, null]);
+          if (typeof de.getAttributeNames !== "function") resolve([-2, null]);
+          resolve([0, de.getAttributeNames()]);
+        });
       }
     };
 
