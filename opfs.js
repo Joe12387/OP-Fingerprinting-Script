@@ -86,6 +86,12 @@ const fingerprint = function () {
             vendor: function () {
                 return Promise.resolve(navigator.vendor || -1);
             },
+            productSub: function () {
+                return Promise.resolve(navigator.productSub || -1);
+            },
+            appVersion: function () {
+                return Promise.resolve(navigator.appVersion || -1);
+            },
             colorDepth: function () {
                 return Promise.resolve(window.screen.colorDepth);
             },
@@ -103,7 +109,12 @@ const fingerprint = function () {
                 return Promise.resolve(navigator.cpuClass || -1);
             },
             hardwareConcurrency: function () {
-                return Promise.resolve((isBrave() || isFirefox() ? 0 : navigator.hardwareConcurrency) || -1);
+                if (isBrave() || isFirefoxResistFingerprinting()) {
+                    return Promise.resolve([-1, null]);
+                }
+                ;
+                let hc = navigator.hardwareConcurrency;
+                return Promise.resolve(hc === undefined ? [0, hc] : [-2, null]);
             },
             deviceMemory: function () {
                 return Promise.resolve((isBrave() ? 0 : navigator.deviceMemory) || -1);
@@ -225,7 +236,7 @@ const fingerprint = function () {
             timezoneOffset: function () {
                 return new Promise(function (resolve) {
                     const year = (new Date).getFullYear();
-                    resolve(-Math.max(parseFloat(new Date(year, 0, 1).getTimezoneOffset()), parseFloat(new Date(year, 6, 1).getTimezoneOffset())));
+                    resolve([0, -Math.max(parseFloat(new Date(year, 0, 1).getTimezoneOffset()), parseFloat(new Date(year, 6, 1).getTimezoneOffset()))]);
                 });
             },
             language: function () {
@@ -417,39 +428,41 @@ const fingerprint = function () {
             performance: function () {
                 return new Promise(function (resolve) {
                     if (!isChrome())
-                        resolve(-1);
+                        resolve([-1, null]);
                     const perf = window.performance;
+                    if (typeof perf === undefined)
+                        resolve([-2, null]);
+                    if (typeof perf.now !== "function")
+                        resolve([-3, null]);
                     let valueA = 1;
                     let valueB = 1;
-                    if (!!perf && !!perf.now) {
-                        let now = perf.now();
-                        let newNow = now;
-                        for (var i = 0; i < 50000; i++) {
-                            if ((now = newNow) < (newNow = perf.now())) {
-                                let difference = newNow - now;
-                                if (difference > valueA) {
-                                    if (difference < valueB) {
-                                        valueB = difference;
-                                    }
+                    let now = perf.now();
+                    let newNow = now;
+                    for (let i = 0; i < 50000; i++) {
+                        if ((now = newNow) < (newNow = perf.now())) {
+                            let difference = newNow - now;
+                            if (difference > valueA) {
+                                if (difference < valueB) {
+                                    valueB = difference;
                                 }
-                                else if (difference < valueA) {
-                                    valueB = valueA;
-                                    valueA = difference;
-                                }
+                            }
+                            else if (difference < valueA) {
+                                valueB = valueA;
+                                valueA = difference;
                             }
                         }
                     }
-                    resolve([valueA, valueB]);
+                    resolve([0, [valueA, valueB]]);
                 });
             },
             speechSynthesis: function () {
                 return new Promise(function (resolve) {
                     if (isBrave() || isFirefox())
-                        resolve(0);
+                        resolve(-1);
                     let tripped = false;
                     let synth = window.speechSynthesis;
                     if (synth === undefined)
-                        resolve(-1);
+                        resolve(-2);
                     function populateVoiceList() {
                         let voices = synth.getVoices();
                         let output = [];
@@ -481,10 +494,10 @@ const fingerprint = function () {
                 return new Promise(function (resolve) {
                     const a = document.createElement("a").attributionsourceid;
                     if (a !== undefined) {
-                        resolve(String(a));
+                        resolve([0, String(a)]);
                     }
                     else {
-                        resolve(-1);
+                        resolve([-1, null]);
                     }
                 });
             },
@@ -736,6 +749,20 @@ const fingerprint = function () {
                         resolve([-2, null]);
                     resolve([0, de.getAttributeNames()]);
                 });
+            },
+            errorToSource: () => {
+                try {
+                    throw "lol";
+                }
+                catch (e) {
+                    try {
+                        let tmp = e.toSource();
+                        return true;
+                    }
+                    catch (ee) {
+                        return false;
+                    }
+                }
             }
         };
         // console.log(fingerprints.speechSynthesis());
