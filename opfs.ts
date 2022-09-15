@@ -854,6 +854,9 @@
           };
           resolve(err);
         });
+      },
+      installTrigger: () => {
+        return Promise.resolve(window.InstallTrigger !== undefined);
       }
     } as any;
 

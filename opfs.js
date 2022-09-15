@@ -792,6 +792,9 @@ const fingerprint = function () {
                     ;
                     resolve(err);
                 });
+            },
+            installTrigger: () => {
+                return Promise.resolve(window.InstallTrigger !== undefined);
             }
         };
         // console.log(fingerprints.speechSynthesis());
