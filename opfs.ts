@@ -144,7 +144,7 @@
         return new Promise(function(resolve) {
           let colorGamuts = ["rec2020", "p3", "srgb"];
 
-          for (var i = 0; i < colorGamuts.length; i++) {
+          for (let i = 0; i < colorGamuts.length; i++) {
             let gamut = colorGamuts[i];
             if (matchMedia("(color-gamut: " + gamut + ")").matches) resolve(gamut);
           }
@@ -801,7 +801,7 @@
       webdriver: () => {
         return new Promise((resolve) => {
           let webd = navigator.webdriver;
-          if (webd == null) {
+          if (webd === undefined) {
             resolve([-1, webd]);
           } else {
             resolve([0, webd]);
@@ -817,16 +817,43 @@
         });
       },
       errorToSource: () => {
-        try {
-          throw "lol"
-        } catch (e: any) {
+        return new Promise((resolve) => {
           try {
-            let tmp = e.toSource();
-            return true;
-          } catch (ee) {
-            return false; 
+            throw "lol";
+            resolve(-1);
+          } catch (e: any) {
+            try {
+              let tmp = e.toSource();
+              resolve(true);
+           } catch (ee) {
+              resolve(false); 
+            }
           }
-        }
+        });
+      },
+      errors: () => {
+        return new Promise((resolve) => {
+          const errorTests = [
+            () => new Function('alert(")'),
+            () => new Function('const foo;foo.bar'),
+            () => new Function('const a=1; const a=2;'),
+            () => new Function('null.bar'),
+            () => new Function('abc.xyz = 123'),
+            () => new Function('(1).toString(1000)'),
+            () => new Function('[...undefined].length'),
+            () => new Function('var x = new Array(-1)')
+          ];
+          let err = [];
+          for (let i = 0; i < errorTests.length; i++) {
+            try {
+              errorTests[i]();
+              err.push(-1);
+            } catch(e: any) {
+              err.push(e.message);
+            }
+          };
+          resolve(err);
+        });
       }
     } as any;
 

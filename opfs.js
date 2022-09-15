@@ -131,7 +131,7 @@ const fingerprint = function () {
             colorGamut: function () {
                 return new Promise(function (resolve) {
                     let colorGamuts = ["rec2020", "p3", "srgb"];
-                    for (var i = 0; i < colorGamuts.length; i++) {
+                    for (let i = 0; i < colorGamuts.length; i++) {
                         let gamut = colorGamuts[i];
                         if (matchMedia("(color-gamut: " + gamut + ")").matches)
                             resolve(gamut);
@@ -430,7 +430,7 @@ const fingerprint = function () {
                     if (!isChrome())
                         resolve([-1, null]);
                     const perf = window.performance;
-                    if (typeof perf === undefined)
+                    if (perf === undefined)
                         resolve([-2, null]);
                     if (typeof perf.now !== "function")
                         resolve([-3, null]);
@@ -732,7 +732,7 @@ const fingerprint = function () {
             webdriver: () => {
                 return new Promise((resolve) => {
                     let webd = navigator.webdriver;
-                    if (webd == null) {
+                    if (webd === undefined) {
                         resolve([-1, webd]);
                     }
                     else {
@@ -751,18 +751,47 @@ const fingerprint = function () {
                 });
             },
             errorToSource: () => {
-                try {
-                    throw "lol";
-                }
-                catch (e) {
+                return new Promise((resolve) => {
                     try {
-                        let tmp = e.toSource();
-                        return true;
+                        throw "lol";
+                        resolve(-1);
                     }
-                    catch (ee) {
-                        return false;
+                    catch (e) {
+                        try {
+                            let tmp = e.toSource();
+                            resolve(true);
+                        }
+                        catch (ee) {
+                            resolve(false);
+                        }
                     }
-                }
+                });
+            },
+            errors: () => {
+                return new Promise((resolve) => {
+                    const errorTests = [
+                        () => new Function('alert(")'),
+                        () => new Function('const foo;foo.bar'),
+                        () => new Function('null.bar'),
+                        () => new Function('abc.xyz = 123'),
+                        () => new Function('(1).toString(1000)'),
+                        () => new Function('[...undefined].length'),
+                        () => new Function('var x = new Array(-1)'),
+                        () => new Function('const a=1; const a=2;')
+                    ];
+                    let err = [];
+                    for (let i = 0; i < errorTests.length; i++) {
+                        try {
+                            errorTests[i]();
+                            err.push(-1);
+                        }
+                        catch (e) {
+                            err.push(e.message);
+                        }
+                    }
+                    ;
+                    resolve(err);
+                });
             }
         };
         // console.log(fingerprints.speechSynthesis());
