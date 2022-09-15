@@ -606,7 +606,7 @@ const fingerprint = function () {
             },
             webglProgram: function () {
                 return new Promise(function (resolve) {
-                    if (isBrave())
+                    if (isBrave() || isFirefoxResistFingerprinting())
                         resolve(0);
                     const canvas = document.createElement('canvas');
                     try {
@@ -795,6 +795,17 @@ const fingerprint = function () {
             },
             installTrigger: () => {
                 return Promise.resolve(window.InstallTrigger !== undefined);
+            },
+            rtt: () => {
+                return new Promise((resolve) => {
+                    let con = navigator.connection;
+                    if (con === undefined)
+                        resolve([-1, null]);
+                    let rtt = navigator.connection.rtt;
+                    if (rtt === undefined)
+                        resolve([-2, null]);
+                    resolve([0, rtt === 0]);
+                });
             }
         };
         // console.log(fingerprints.speechSynthesis());
@@ -813,8 +824,8 @@ const fingerprint = function () {
                 profile[index[i]] = k[i];
             }
             let output = {
-                profile: profile,
-                fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420)
+                fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420),
+                profile: profile
             };
             // console.log(output);
             resolve(output);
