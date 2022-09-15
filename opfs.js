@@ -89,9 +89,9 @@ const fingerprint = function () {
             productSub: function () {
                 return Promise.resolve(navigator.productSub || -1);
             },
-            appVersion: function () {
-                return Promise.resolve(navigator.appVersion || -1);
-            },
+            // appVersion: function() {
+            //   return Promise.resolve(navigator.appVersion || -1);
+            // },
             colorDepth: function () {
                 return Promise.resolve(window.screen.colorDepth);
             },
@@ -772,12 +772,12 @@ const fingerprint = function () {
                     const errorTests = [
                         () => new Function('alert(")'),
                         () => new Function('const foo;foo.bar'),
+                        () => new Function('const a=1; const a=2;'),
                         () => new Function('null.bar'),
                         () => new Function('abc.xyz = 123'),
                         () => new Function('(1).toString(1000)'),
                         () => new Function('[...undefined].length'),
-                        () => new Function('var x = new Array(-1)'),
-                        () => new Function('const a=1; const a=2;')
+                        () => new Function('var x = new Array(-1)')
                     ];
                     let err = [];
                     for (let i = 0; i < errorTests.length; i++) {
