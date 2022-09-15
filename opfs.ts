@@ -102,9 +102,9 @@
       productSub: function() {
         return Promise.resolve(navigator.productSub || -1);
       },
-      appVersion: function() {
-        return Promise.resolve(navigator.appVersion || -1);
-      },
+      // appVersion: function() {
+      //   return Promise.resolve(navigator.appVersion || -1);
+      // },
       colorDepth: function() {
         return Promise.resolve(window.screen.colorDepth);
       },
