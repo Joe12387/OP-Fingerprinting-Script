@@ -126,7 +126,7 @@
           return Promise.resolve([-1, null]);
         };
         let hc = navigator.hardwareConcurrency;
-        return Promise.resolve(hc === undefined ? [0, hc] : [-2, null]);
+        return Promise.resolve(hc !== undefined ? [0, hc] : [-2, null]);
       },
       deviceMemory: function() {
         return Promise.resolve((isBrave() ? 0 : (navigator as any).deviceMemory) || -1);
