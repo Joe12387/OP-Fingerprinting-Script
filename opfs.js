@@ -50,11 +50,11 @@ const fingerprint = function () {
         return h1 >>> 0;
     }
     function isSafari() {
-        var v = navigator.vendor;
+        let v = navigator.vendor;
         return v !== undefined && v.indexOf("Apple") === 0;
     }
     function isChrome() {
-        var v = navigator.vendor;
+        let v = navigator.vendor;
         return v !== undefined && v.indexOf("Google") === 0;
     }
     function isFirefox() {
@@ -79,7 +79,7 @@ const fingerprint = function () {
         return isChrome() && navigator.brave !== undefined;
     }
     return new Promise(function (resolve, reject) {
-        var fingerprints = {
+        let fingerprints = {
             platform: function () {
                 return Promise.resolve(navigator.platform || -1);
             },
@@ -99,7 +99,7 @@ const fingerprint = function () {
                 return Promise.resolve(eval.toString().length);
             },
             maxTouchPoints: function () {
-                var n = navigator;
+                let n = navigator;
                 return Promise.resolve(n.maxTouchPoints !== undefined ? n.maxTouchPoints : n.msMaxTouchPoints !== undefined ? n.msMaxTouchPoints : -1);
             },
             cpuClass: function () {
@@ -179,7 +179,7 @@ const fingerprint = function () {
             monochrome: function () {
                 return new Promise(function (resolve) {
                     if (matchMedia("(min-monochrome: 0)").matches) {
-                        for (var i = 0; i <= 100; ++i) {
+                        for (let i = 0; i <= 100; ++i) {
                             if (matchMedia("(max-monochrome: " + i + ")").matches)
                                 resolve([0, i]);
                             throw new Error("Max monochrome value is over 100");
@@ -290,8 +290,8 @@ const fingerprint = function () {
                     pxi_oscillator.start(0);
                     context.startRendering();
                     context.oncomplete = function (evnt) {
-                        var pxi_output = 0;
-                        for (var i = 4500; 5e3 > i; i++) {
+                        let pxi_output = 0;
+                        for (let i = 4500; 5e3 > i; i++) {
                             pxi_output += Math.abs(evnt.renderedBuffer.getChannelData(0)[i]);
                         }
                         pxi_compressor.disconnect();
@@ -537,15 +537,15 @@ const fingerprint = function () {
                     let shaderTypes = ["FRAGMENT_SHADER", "VERTEX_SHADER"];
                     let precisionTypes = ["LOW_FLOAT", "MEDIUM_FLOAT", "HIGH_FLOAT", "LOW_INT", "MEDIUM_INT", "HIGH_INT"];
                     output.shaderPrecision = [];
-                    for (var i = 0; i < shaderTypes.length; i++) {
-                        var shaderType = shaderTypes[i];
-                        for (var j = 0; j < precisionTypes.length; j++) {
+                    for (let i = 0; i < shaderTypes.length; i++) {
+                        let shaderType = shaderTypes[i];
+                        for (let j = 0; j < precisionTypes.length; j++) {
                             output.shaderPrecision.push(getShaderPrecision(shaderType, precisionTypes[j]));
                         }
                     }
                     output.extensions = [];
                     let extensions = context.getSupportedExtensions();
-                    for (var i = 0; i < extensions.length; i++) {
+                    for (let i = 0; i < extensions.length; i++) {
                         output.extensions.push(extensions[i]);
                     }
                     const extensionList = {
@@ -676,7 +676,7 @@ const fingerprint = function () {
                         });
                     }
                     let dfonts = [];
-                    for (var fi = 0; fi < fontList.length; fi++) {
+                    for (let fi = 0; fi < fontList.length; fi++) {
                         font_test(fontList[fi]).then(function (promise) {
                             dfonts.push(promise);
                         });
@@ -693,12 +693,12 @@ const fingerprint = function () {
                     let plugins = navigator.plugins;
                     let output = [];
                     if (plugins) {
-                        for (var i = 0; i < plugins.length; i++) {
-                            var plugin = plugins[i];
+                        for (let i = 0; i < plugins.length; i++) {
+                            let plugin = plugins[i];
                             if (plugin) {
-                                var mimes = [];
-                                for (var l = 0; l < plugin.length; l++) {
-                                    var mime = plugin[l];
+                                let mimes = [];
+                                for (let l = 0; l < plugin.length; l++) {
+                                    let mime = plugin[l];
                                     mimes.push({
                                         type: mime.type,
                                         suffixes: mime.suffixes
@@ -806,14 +806,13 @@ const fingerprint = function () {
                 });
             }
         };
-        // console.log(fingerprints.speechSynthesis());
         let index = [];
         let promises = [];
         for (let method in fingerprints) {
             index.push(method);
-            console.log(method);
+            // console.log(method);
             let exe = fingerprints[method]();
-            console.log(exe);
+            // console.log(exe);
             promises.push(exe);
         }
         Promise.all(promises).then((k) => {

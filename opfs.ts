@@ -58,12 +58,12 @@
   }
 
   function isSafari() {
-    var v = navigator.vendor;
+    let v = navigator.vendor;
     return v !== undefined && v.indexOf("Apple") === 0;
   }
 
   function isChrome() {
-    var v = navigator.vendor;
+    let v = navigator.vendor;
     return v !== undefined && v.indexOf("Google") === 0;
   }
 
@@ -92,7 +92,7 @@
   }
 
   return new Promise(function(resolve, reject) {
-    var fingerprints = {
+    let fingerprints = {
       platform: function() {
         return Promise.resolve(navigator.platform || -1);
       },
@@ -112,7 +112,7 @@
         return Promise.resolve(eval.toString().length);
       },
       maxTouchPoints: function() {
-        var n = navigator as any;
+        let n = navigator as any;
         return Promise.resolve(n.maxTouchPoints !== undefined ? n.maxTouchPoints : n.msMaxTouchPoints !== undefined ? n.msMaxTouchPoints : -1);
       },
       cpuClass: function() {
@@ -192,7 +192,7 @@
       monochrome: function() {
         return new Promise(function(resolve) {
           if (matchMedia("(min-monochrome: 0)").matches) {
-            for (var i = 0; i <= 100; ++i) {
+            for (let i = 0; i <= 100; ++i) {
               if (matchMedia("(max-monochrome: " + i + ")").matches) resolve([0, i]);
               throw new Error("Max monochrome value is over 100");
             }
@@ -307,8 +307,8 @@
           pxi_oscillator.start(0);
           (context as any).startRendering();
           (context as any).oncomplete = function(evnt: any) {
-            var pxi_output = 0;
-            for (var i = 4500; 5e3 > i; i++) {
+            let pxi_output = 0;
+            for (let i = 4500; 5e3 > i; i++) {
               pxi_output += Math.abs(evnt.renderedBuffer.getChannelData(0)[i]);
             }
             pxi_compressor.disconnect();
@@ -584,16 +584,16 @@
           let precisionTypes = ["LOW_FLOAT", "MEDIUM_FLOAT", "HIGH_FLOAT", "LOW_INT", "MEDIUM_INT", "HIGH_INT"];
 
           output.shaderPrecision = [];
-          for (var i = 0; i < shaderTypes.length; i++) {
-            var shaderType = shaderTypes[i];
-            for (var j = 0; j < precisionTypes.length; j++) {
+          for (let i = 0; i < shaderTypes.length; i++) {
+            let shaderType = shaderTypes[i];
+            for (let j = 0; j < precisionTypes.length; j++) {
               output.shaderPrecision.push(getShaderPrecision(shaderType, precisionTypes[j]));
             }
           }
 
           output.extensions = [];
           let extensions = context.getSupportedExtensions();
-          for (var i = 0; i < extensions.length; i++) {
+          for (let i = 0; i < extensions.length; i++) {
             output.extensions.push(extensions[i]);
           }
 
@@ -742,7 +742,7 @@
 
           let dfonts = [] as any;
 
-          for (var fi = 0; fi < fontList.length; fi++) {
+          for (let fi = 0; fi < fontList.length; fi++) {
             font_test(fontList[fi]).then(function(promise: any) {
               dfonts.push(promise);
             });
@@ -758,12 +758,12 @@
           let plugins = (navigator as any).plugins;
           let output = [] as any;
           if (plugins) {
-            for (var i = 0; i < (plugins as any).length; i++) {
-              var plugin = plugins[i];
+            for (let i = 0; i < (plugins as any).length; i++) {
+              let plugin = plugins[i];
               if (plugin) {
-                var mimes = [] as any;
-                for (var l = 0; l < plugin.length; l++) {
-                  var mime = plugin[l];
+                let mimes = [] as any;
+                for (let l = 0; l < plugin.length; l++) {
+                  let mime = plugin[l];
                   mimes.push({
                     type: mime.type,
                     suffixes: mime.suffixes
