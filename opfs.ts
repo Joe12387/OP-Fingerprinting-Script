@@ -132,7 +132,7 @@
         return Promise.resolve((navigator as any).oscpu || -1);
       },
       doNotTrack: function() {
-        return Promise.resolve(navigator.doNotTrack !== undefined ? navigator.doNotTrack : -1);
+        return Promise.resolve(navigator.doNotTrack !== undefined ? [0, navigator.doNotTrack] : [-1, null]);
       },
       sourceBuffer: function() {
         return Promise.resolve([0, [typeof SourceBuffer, typeof SourceBufferList]]);
@@ -263,8 +263,8 @@
         });
       },
       screenResolution: function() {
-        if (isFirefoxResistFingerprinting()) return [-1, null];
-        return Promise.resolve([0, [screen.width, screen.height].sort().reverse().join("x")]);
+        if (isFirefoxResistFingerprinting()) return Promise.resolve([-1, null]);
+        return Promise.resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
       },
       jsHeapSizeLimit: function() {
         return new Promise(function(resolve) {
