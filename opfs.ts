@@ -113,23 +113,53 @@
       },
       maxTouchPoints: function() {
         let n = navigator as any;
-        return Promise.resolve(n.maxTouchPoints !== undefined ? n.maxTouchPoints : n.msMaxTouchPoints !== undefined ? n.msMaxTouchPoints : -1);
+        return Promise.resolve(n.maxTouchPoints !== undefined ? [0, n.maxTouchPoints] : n.msMaxTouchPoints !== undefined ? [1, n.msMaxTouchPoints] : [-1, null]);
       },
       cpuClass: function() {
-        return Promise.resolve((navigator as any).cpuClass || -1);
+        return new Promise((resolve: any) => {
+          let cpu = (navigator as any).cpuClass;
+          if (cpu === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, cpu]);
+          }
+        });        
       },
       hardwareConcurrency: function() {
-        if (isBrave() || isFirefoxResistFingerprinting()) {
-          return Promise.resolve([-2, null]);
-        };
-        let hc = navigator.hardwareConcurrency;
-        return Promise.resolve(hc !== undefined ? [0, hc] : [-1, null]);
+        return new Promise((resolve) => {
+          if (isBrave() || isFirefoxResistFingerprinting()) {
+            return Promise.resolve([-2, null]);
+          };  
+          let hc = navigator.hardwareConcurrency;
+          if (hc === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, hc]);
+          }
+        });
       },
       deviceMemory: function() {
-        return Promise.resolve((isBrave() ? 0 : (navigator as any).deviceMemory) || -1);
+        return new Promise((resolve: any) => {
+          if (isBrave()) {
+            return Promise.resolve([-2, null]);
+          };  
+          let dm = (navigator as any).deviceMemory;
+          if (dm === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, dm]);
+          }
+        });
       },
       oscpu: function() {
-        return Promise.resolve((navigator as any).oscpu || -1);
+        return new Promise((resolve: any) => {
+          let os = (navigator as any).oscpu;
+          if (os === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, os]);
+          }
+        });        
       },
       doNotTrack: function() {
         return Promise.resolve(navigator.doNotTrack !== undefined ? [0, navigator.doNotTrack] : [-1, null]);
@@ -850,15 +880,55 @@
         });
       },
       installTrigger: () => {
-        return Promise.resolve([0, window.InstallTrigger !== undefined]);
+        return Promise.resolve([0, (window as any).InstallTrigger !== undefined]);
       },
       rtt: () => {
         return new Promise((resolve) => {
-          let con = navigator.connection;
+          let con = (navigator as any).connection;
           if (con === undefined) resolve([-1, null]);
-          let rtt = navigator.connection.rtt;
+          let rtt = (navigator as any).connection.rtt;
           if (rtt === undefined) resolve([-2, null]);
           resolve([0, rtt === 0]);
+        });
+      },
+      math: () => {
+        return new Promise((resolve) => {
+          let m = Math;
+
+          let returnZero = function() {
+            return 0;
+          };
+
+          let e = 1e154;
+      
+          let fp = [
+            (m.acos || returnZero)(.12312423423423424),
+            (m.acosh || returnZero)(1e308),
+            (m.log(e + m.sqrt(e * e - 1))),
+            (m.asin || returnZero)(.12312423423423424),
+            (m.asinh || returnZero)(1),
+            m.log(m.sqrt(2) + 1),
+            (m.atanh || returnZero)(.5),
+            m.log(3) / 2,
+            (m.atan || returnZero)(.5),
+            (m.sin || returnZero)(-1e300),
+            (m.sinh || returnZero)(1),
+            m.exp(1) - 1 / m.exp(1) / 2,
+            (m.cos || returnZero)(10.000000000123),
+            (m.cosh || returnZero)(1),
+            (m.exp(1) + 1 / m.exp(1)) / 2,
+            (m.tan || returnZero)(-1e300),
+            (m.tanh || returnZero)(1),
+            (m.exp(2) - 1) / (m.exp(2) + 1),
+            (m.exp || returnZero)(1),
+            (m.expm1 || returnZero)(1),
+            m.exp(1) - 1,
+            (m.log1p || returnZero)(10),
+            m.log(11),
+            m.pow(m.PI, -100)
+          ];
+      
+          resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
         });
       }
     } as any;
