@@ -116,7 +116,7 @@ const fingerprint = function () {
             hardwareConcurrency: function () {
                 return new Promise((resolve) => {
                     if (isBrave() || isFirefoxResistFingerprinting()) {
-                        return Promise.resolve([-2, null]);
+                        return resolve([-2, null]);
                     }
                     ;
                     let hc = navigator.hardwareConcurrency;
@@ -131,7 +131,7 @@ const fingerprint = function () {
             deviceMemory: function () {
                 return new Promise((resolve) => {
                     if (isBrave()) {
-                        return Promise.resolve([-2, null]);
+                        return resolve([-2, null]);
                     }
                     ;
                     let dm = navigator.deviceMemory;
@@ -881,9 +881,9 @@ const fingerprint = function () {
         let promises = [];
         for (let method in fingerprints) {
             index.push(method);
-            // console.log(method);
+            console.log(method);
             let exe = fingerprints[method]();
-            // console.log(exe);
+            console.log(exe);
             promises.push(exe);
         }
         Promise.all(promises).then((k) => {

@@ -116,7 +116,7 @@
         return Promise.resolve(n.maxTouchPoints !== undefined ? [0, n.maxTouchPoints] : n.msMaxTouchPoints !== undefined ? [1, n.msMaxTouchPoints] : [-1, null]);
       },
       cpuClass: function() {
-        return new Promise((resolve: any) => {
+        return new Promise((resolve) => {
           let cpu = (navigator as any).cpuClass;
           if (cpu === undefined) {
             resolve([-1, null]);
@@ -128,7 +128,7 @@
       hardwareConcurrency: function() {
         return new Promise((resolve) => {
           if (isBrave() || isFirefoxResistFingerprinting()) {
-            return Promise.resolve([-2, null]);
+            return resolve([-2, null]);
           };  
           let hc = navigator.hardwareConcurrency;
           if (hc === undefined) {
@@ -139,9 +139,9 @@
         });
       },
       deviceMemory: function() {
-        return new Promise((resolve: any) => {
+        return new Promise((resolve) => {
           if (isBrave()) {
-            return Promise.resolve([-2, null]);
+            return resolve([-2, null]);
           };  
           let dm = (navigator as any).deviceMemory;
           if (dm === undefined) {
@@ -152,7 +152,7 @@
         });
       },
       oscpu: function() {
-        return new Promise((resolve: any) => {
+        return new Promise((resolve) => {
           let os = (navigator as any).oscpu;
           if (os === undefined) {
             resolve([-1, null]);
@@ -937,9 +937,9 @@
     let promises = [] as any;
     for (let method in fingerprints) {
       index.push(method);
-      // console.log(method);
+      console.log(method);
       let exe = fingerprints[method]();
-      // console.log(exe);
+      console.log(exe);
       promises.push(exe);
     }
 
