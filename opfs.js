@@ -766,7 +766,7 @@ const fingerprint = function () {
                 return new Promise((resolve) => {
                     let webd = navigator.webdriver;
                     if (webd === undefined) {
-                        resolve([-1, webd]);
+                        resolve([-1, null]);
                     }
                     else {
                         resolve([0, webd]);
