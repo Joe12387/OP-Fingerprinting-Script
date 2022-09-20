@@ -94,22 +94,57 @@
   return new Promise(function(resolve, reject) {
     let fingerprints = {
       platform: function() {
-        return Promise.resolve(navigator.platform || -1);
+        return new Promise((resolve) => {
+          let np = navigator.platform;
+          if (np === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, np]);
+          }
+        });        
       },
       vendor: function() {
-        return Promise.resolve(navigator.vendor || -1);
+        return new Promise((resolve) => {
+          let nv = navigator.vendor;
+          if (nv === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, nv]);
+          }
+        });        
       },
       productSub: function() {
-        return Promise.resolve(navigator.productSub || -1);
+        return new Promise((resolve) => {
+          let ps = navigator.productSub;
+          if (ps === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, ps]);
+          }
+        });        
       },
       colorDepth: function() {
-        return Promise.resolve(window.screen.colorDepth);
+        return new Promise((resolve) => {
+          let cd = window.screen.colorDepth;
+          if (cd === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, cd]);
+          }
+        });        
       },
       devicePixelRatio: function() {
-        return Promise.resolve(window.devicePixelRatio);
+        return new Promise((resolve) => {
+          let dpr = window.devicePixelRatio;
+          if (dpr === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, dpr]);
+          }
+        });        
       },
       evalToString: function() {
-        return Promise.resolve(eval.toString().length);
+        return Promise.resolve([0, eval.toString().length]);
       },
       maxTouchPoints: function() {
         let n = navigator as any;
