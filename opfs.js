@@ -790,6 +790,16 @@ const fingerprint = function () {
                     resolve([0, output]);
                 });
             },
+            pluginLengthIsZero: () => {
+                return new Promise((resolve) => {
+                    let plugins = navigator.plugins;
+                    if (plugins === undefined)
+                        resolve([-1, null]);
+                    if (plugins.length === undefined)
+                        resolve([-2, null]);
+                    resolve([0, plugins.length === 0]);
+                });
+            },
             sharedArrayBuffer: () => {
                 return new Promise((resolve) => {
                     if (typeof window.SharedArrayBuffer === "function") {
