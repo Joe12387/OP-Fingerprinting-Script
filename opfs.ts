@@ -964,7 +964,7 @@
           ];
       
           resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
-        })
+        });
       },
       notifications: () => {
           return new Promise((resolve) => {
@@ -979,7 +979,7 @@
             }
             navigator.permissions.query({name: "notifications"}).then((res) => {
               // console.log(res);
-              resolve([0, [window.Notification.permission, res.state]]);
+              resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
             }).catch((res) => {
               // console.log(res);
               resolve([-4, null]);

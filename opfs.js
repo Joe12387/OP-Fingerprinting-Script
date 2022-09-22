@@ -928,10 +928,10 @@ const fingerprint = function () {
                         resolve([-3, null]);
                     }
                     navigator.permissions.query({ name: "notifications" }).then((res) => {
-                        console.log(res);
-                        resolve([0, [window.Notification.permission, res.state]]);
+                        // console.log(res);
+                        resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
                     }).catch((res) => {
-                        console.log(res);
+                        // console.log(res);
                         resolve([-4, null]);
                     });
                 });
