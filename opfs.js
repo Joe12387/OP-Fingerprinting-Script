@@ -915,15 +915,35 @@ const fingerprint = function () {
                     ];
                     resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
                 });
+            },
+            notifications: () => {
+                return new Promise((resolve) => {
+                    if (window.Notification === undefined) {
+                        resolve([-1, null]);
+                    }
+                    if (navigator.permissions === undefined) {
+                        resolve([-2, null]);
+                    }
+                    if (typeof navigator.permissions.query !== "function") {
+                        resolve([-3, null]);
+                    }
+                    navigator.permissions.query({ name: "notifications" }).then((res) => {
+                        console.log(res);
+                        resolve([0, [window.Notification.permission, res.state]]);
+                    }).catch((res) => {
+                        console.log(res);
+                        resolve([-4, null]);
+                    });
+                });
             }
         };
         let index = [];
         let promises = [];
         for (let method in fingerprints) {
             index.push(method);
-            console.log(method);
+            // console.log(method);
             let exe = fingerprints[method]();
-            console.log(exe);
+            // console.log(exe);
             promises.push(exe);
         }
         Promise.all(promises).then((k) => {
