@@ -511,7 +511,7 @@ const fingerprint = function () {
                     let valueB = 1;
                     let now = perf.now();
                     let newNow = now;
-                    for (let i = 0; i < 50000; i++) {
+                    for (let i = 0; i < 5000; i++) {
                         if ((now = newNow) < (newNow = perf.now())) {
                             let difference = newNow - now;
                             if (difference > valueA) {
@@ -525,7 +525,7 @@ const fingerprint = function () {
                             }
                         }
                     }
-                    resolve([0, [valueA, valueB]]);
+                    resolve([0, valueA]);
                 });
             },
             speechSynthesis: function () {
