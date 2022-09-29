@@ -849,7 +849,6 @@
         return new Promise((resolve) => {
           let plugins = (navigator as any).plugins;
           if (plugins === undefined) resolve([-1, null]);
-          if (plugins.length === undefined) resolve([-2, null]);
           resolve([0, plugins.length === 0]);
         });
       },
@@ -887,7 +886,6 @@
         return new Promise((resolve) => {
           try {
             throw "lol";
-            resolve([-1, null]);
           } catch (e: any) {
             try {
               let tmp = e.toSource();
@@ -896,6 +894,7 @@
               resolve([0, false]); 
             }
           }
+          resolve([-1, null]);
         });
       },
       errors: () => {

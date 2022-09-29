@@ -795,8 +795,6 @@ const fingerprint = function () {
                     let plugins = navigator.plugins;
                     if (plugins === undefined)
                         resolve([-1, null]);
-                    if (plugins.length === undefined)
-                        resolve([-2, null]);
                     resolve([0, plugins.length === 0]);
                 });
             },
@@ -837,7 +835,6 @@ const fingerprint = function () {
                 return new Promise((resolve) => {
                     try {
                         throw "lol";
-                        resolve([-1, null]);
                     }
                     catch (e) {
                         try {
@@ -848,6 +845,7 @@ const fingerprint = function () {
                             resolve([0, false]);
                         }
                     }
+                    resolve([-1, null]);
                 });
             },
             errors: () => {
