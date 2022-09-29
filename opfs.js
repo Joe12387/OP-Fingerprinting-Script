@@ -828,7 +828,7 @@ const fingerprint = function () {
                         resolve([-1, null]);
                     if (typeof de.getAttributeNames !== "function")
                         resolve([-2, null]);
-                    resolve([0, de.getAttributeNames()]);
+                    resolve([0, de.getAttributeNames().length > 0]);
                 });
             },
             errorToSource: () => {
