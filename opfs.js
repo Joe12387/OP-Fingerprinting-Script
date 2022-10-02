@@ -158,7 +158,6 @@ const fingerprint = function () {
                     if (isBrave() || isFirefoxResistFingerprinting()) {
                         return resolve([-2, null]);
                     }
-                    ;
                     let hc = navigator.hardwareConcurrency;
                     if (hc === undefined) {
                         resolve([-1, null]);
@@ -173,7 +172,6 @@ const fingerprint = function () {
                     if (isBrave()) {
                         return resolve([-2, null]);
                     }
-                    ;
                     let dm = navigator.deviceMemory;
                     if (dm === undefined) {
                         resolve([-1, null]);
@@ -323,9 +321,11 @@ const fingerprint = function () {
                 });
             },
             screenResolution: function () {
-                if (isFirefoxResistFingerprinting())
-                    return Promise.resolve([-1, null]);
-                return Promise.resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
+                return new Promise(function (resolve) {
+                    if (isFirefoxResistFingerprinting())
+                        resolve([-1, null]);
+                    resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
+                });
             },
             jsHeapSizeLimit: function () {
                 return new Promise(function (resolve) {
@@ -939,9 +939,18 @@ const fingerprint = function () {
                         // console.log(res);
                         resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
                     }).catch((res) => {
-                        // console.log(res);
+                        console.log(res);
                         resolve([-4, null]);
                     });
+                });
+            },
+            numberFormat: () => {
+                return new Promise((resolve) => {
+                    if (typeof window.Intl.NumberFormat !== "function")
+                        resolve([-1, null]);
+                    if (typeof window.Intl.NumberFormat().format !== "function")
+                        resolve([-2, null]);
+                    resolve(window.Intl.NumberFormat().format(1000000.01));
                 });
             }
         };
