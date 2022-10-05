@@ -1,10 +1,10 @@
 # OP JavaScript Browser Fingerprinting Script
- OPFS is a novel, overpowered browser fingerprinting library coded in JavaScript for creating persistent, unique and long-lasting fingerprints without depending on ever-changing variables such as the user agent string commonly used in other browser fingerprinting libraries. As such, the fingerprint does not change most of the time when a user upgrades their browser to the current version.
+ OPFS is a browser fingerprinting library for creating persistent, unique and long-lasting digital fingerprints without depending on ever-changing variables such as the user agent string commonly used in other browser fingerprinting libraries. As such, the fingerprint does not change most of the time when a user upgrades their browser to the current version.
 
 [DEMO](https://detectincognito.com/opfs.html "DEMO")
 
 ## Overpowered?
- OPFS uses some novel methods not well known before the publishing of this repo that allow the creation of a likely completely unique device fingerprint in Mozilla Firefox, Google Chrome, Microsoft Edge and other Chromium-based browsers such as Opera and Brave.
+ OPFS uses some novel methods not well known before the publishing of this repo that allow the creation of a likely completely unique device fingerprint in Google Chrome, Microsoft Edge and other Chromium-based browsers.
  
  The library is able to detect and mitigate the effects of browser-based anti-fingerprinting technologies introduced to certain browsers in the past few years with the release of Brave Browser and Safari 13+. The script will not use randomized fingerprints in such browsers and instead settle on a fingerprint that is to be persistent as long as possible at the expense of uniqueness.
  
@@ -21,6 +21,18 @@
  * performance.now(): A previously unpublished method of using performance.now() to create a unique value (6.1x more unique than CanvasAPI)
  * speechSynthesis: A method of enumerating all synthetic voices available to the browser into a fingerprint.
  
+## Use
+```javascript
+fingerprint().then((result) => {
+  console.log(result.fingerprints, result.profile);
+});
+```
+
+ ## Specialty Fingerprints
+ OPFS returns multiple fingerprints accessible via `result.fingerprints`. 
+  * `result.fingerprints.uniqueFp` uses all available fingerprints and is most useful when you value uniqueness over persistance. While this fingerprint is unlikely to change often, it will still change eventually as browsers are updated.
+  * `result.fingerprints.persistentFp` is useful if you value persistence over uniqueness. It will not be as unique but should rarely, if ever, change.
+
  ## Expected Behavior
  * The fingerprint should not change between page loads or if the browser is restarted.
  * The fingerprint should not change if the user is in incognito or private mode.

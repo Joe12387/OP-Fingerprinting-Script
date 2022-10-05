@@ -135,6 +135,7 @@
       },
       devicePixelRatio: function() {
         return new Promise((resolve) => {
+          if (isChrome() && !isBrave()) resolve([-2, null]);
           let dpr = window.devicePixelRatio;
           if (dpr === undefined) {
             resolve([-1, null]);
@@ -330,6 +331,7 @@
       screenResolution: function() {
         return new Promise(function(resolve) {
           if (isFirefoxResistFingerprinting()) resolve([-1, null]);
+          if (isChrome() && !isBrave()) resolve([-2, null]);
           resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
         });
     },
@@ -999,7 +1001,7 @@
         return new Promise((resolve) => {
           if (typeof window.Intl.NumberFormat !== "function") resolve([-1, null]);
           if (typeof window.Intl.NumberFormat().format !== "function") resolve([-2, null]);
-          resolve(window.Intl.NumberFormat().format(1000000.01));
+          resolve([0, window.Intl.NumberFormat().format(1000000.01)]);
         });
       }
     } as any;
@@ -1019,8 +1021,23 @@
       for (let i = 0; i < index.length; i++) {
         profile[index[i]] = k[i];
       }
-      let output = {
-        fingerprint: murmurhash3_32_gc(JSON.stringify(profile), 420),
+      const authFpComponetents = [
+        profile.jsHeapSizeLimit,
+        profile.audioContext,
+        profile.canvasAPI,
+        profile.performance,
+        profile.speechSynthesis,
+        profile.webglInfo,
+        profile.webglProgram,
+      ];
+      const persistentFp = murmurhash3_32_gc(JSON.stringify(authFpComponetents), 420);
+      const uniqueFp = murmurhash3_32_gc(JSON.stringify(profile), 420);
+      const output = {
+        fingerprint: uniqueFp,
+        fingerprints: {
+          uniqueFp: uniqueFp,
+          persistentFp: persistentFp,
+        },
         profile: profile
       };
       // console.log(output);
