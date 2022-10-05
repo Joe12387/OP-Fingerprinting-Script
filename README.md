@@ -30,7 +30,7 @@ fingerprint().then((result) => {
 
  ## Specialty Fingerprints
  OPFS returns multiple fingerprints accessible via `result.fingerprints`. 
-  * `result.fingerprints.uniqueFp` uses all available fingerprints and is most useful when you value uniqueness over persistance. While this fingerprint is unlikely to change often, it will still change eventually as browsers are updated.
+  * `result.fingerprints.uniqueFp` uses all available fingerprints and is most useful when you value uniqueness over persistence. While this fingerprint is unlikely to change often, it will still change eventually as browsers are updated.
   * `result.fingerprints.persistentFp` is useful if you value persistence over uniqueness. It will not be as unique but should rarely, if ever, change.
 
  ## Expected Behavior
