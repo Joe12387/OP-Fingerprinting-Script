@@ -305,14 +305,14 @@
             if (tz) resolve([0, tz]);
           }
           const year = (new Date).getFullYear();
-          const utc = -Math.max(parseFloat(new Date(year, 0, 1).getTimezoneOffset()), parseFloat(new Date(year, 6, 1).getTimezoneOffset()));
+          const utc = -Math.max(parseFloat(""+new Date(year, 0, 1).getTimezoneOffset()), parseFloat(""+new Date(year, 6, 1).getTimezoneOffset()));
           resolve([1, "UTC" + (utc >= 0 ? "+" : "-") + Math.abs(utc)]);
         });
       },
       timezoneOffset: function() {
         return new Promise(function(resolve) {
           const year = (new Date).getFullYear();
-          resolve([0, -Math.max(parseFloat(new Date(year, 0, 1).getTimezoneOffset()), parseFloat(new Date(year, 6, 1).getTimezoneOffset()))]);
+          resolve([0, -Math.max(parseFloat(""+new Date(year, 0, 1).getTimezoneOffset()), parseFloat(""+new Date(year, 6, 1).getTimezoneOffset()))]);
         });
       },
       language: function() {
@@ -997,13 +997,13 @@
             });
           });
       },
-      numberFormat: () => {
-        return new Promise((resolve) => {
-          if (typeof window.Intl.NumberFormat !== "function") resolve([-1, null]);
-          if (typeof window.Intl.NumberFormat().format !== "function") resolve([-2, null]);
-          resolve([0, window.Intl.NumberFormat().format(1000000.01)]);
-        });
-      }
+      // numberFormat: () => {
+      //   return new Promise((resolve) => {
+      //     if (typeof window.Intl.NumberFormat !== "function") resolve([-1, null]);
+      //     if (typeof window.Intl.NumberFormat().format !== "function") resolve([-2, null]);
+      //     resolve([0, window.Intl.NumberFormat().format(1000000.01)]);
+      //   });
+      // }
     } as any;
 
     let index = [] as any;
@@ -1021,7 +1021,8 @@
       for (let i = 0; i < index.length; i++) {
         profile[index[i]] = k[i];
       }
-      const authFpComponetents = [
+      const uniqueFp = murmurhash3_32_gc(JSON.stringify(profile), 420);
+      const persistentFpComponetents = [
         profile.jsHeapSizeLimit,
         profile.audioContext,
         profile.canvasAPI,
@@ -1030,8 +1031,7 @@
         profile.webglInfo,
         profile.webglProgram,
       ];
-      const persistentFp = murmurhash3_32_gc(JSON.stringify(authFpComponetents), 420);
-      const uniqueFp = murmurhash3_32_gc(JSON.stringify(profile), 420);
+      const persistentFp = murmurhash3_32_gc(JSON.stringify(persistentFpComponetents), 420);
       const output = {
         fingerprint: uniqueFp,
         fingerprints: {
