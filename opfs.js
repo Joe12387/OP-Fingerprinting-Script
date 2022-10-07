@@ -858,23 +858,22 @@ const fingerprint = function () {
                         () => new Function('alert(")'),
                         () => new Function('const foo;foo.bar'),
                         () => new Function('const a=1; const a=2;'),
-                        () => new Function('null.bar'),
-                        () => new Function('abc.xyz = 123'),
-                        () => new Function('(1).toString(1000)'),
-                        () => new Function('[...undefined].length'),
-                        () => new Function('var x = new Array(-1)')
+                        () => new Function('try{null.bar;return -1}catch(e){return e.message}'),
+                        () => new Function('try{abc.xyz=123;return -1}catch(e){return e.message}'),
+                        () => new Function('try{(1).toString(1000);return -1}catch(e){return e.message}'),
+                        () => new Function('try{[...undefined].length;return -1}catch(e){return e.message}'),
+                        () => new Function('try{var x=new Array(-1);return -1}catch(e){return e.message}'),
                     ];
                     let err = [];
                     for (let i = 0; i < errorTests.length; i++) {
                         try {
-                            errorTests[i]();
-                            err.push(-1);
+                            let tmp = errorTests[i]();
+                            err.push(tmp);
                         }
                         catch (e) {
                             err.push(e.message);
                         }
                     }
-                    ;
                     resolve([0, err]);
                 });
             },
