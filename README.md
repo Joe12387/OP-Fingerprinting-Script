@@ -3,6 +3,32 @@
 
 [DEMO](https://detectincognito.com/opfs.html "DEMO")
 
+# Usage
+
+Get script from CDN
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/Joe12387/op-fingerprinting-script@main/opfs.min.js"></script>
+```
+
+Or install from NPM
+
+```
+npm i op-fingerprinting-script
+```
+
+```javascript
+import { fingerprint } from "op-fingerprinting-script";
+```
+
+Create the fingerprint
+
+```javascript
+fingerprint().then((result) => {
+  console.log(result.fingerprints, result.profile);
+});
+```
+
 ## Overpowered?
  OPFS uses some novel methods not well known before the publishing of this repo that allow the creation of a likely completely unique device fingerprint in Google Chrome, Microsoft Edge and other Chromium-based browsers.
  
@@ -21,13 +47,6 @@
  * performance.now(): A previously unpublished method of using performance.now() to create a unique value (6.1x more unique than CanvasAPI)
  * speechSynthesis: A method of enumerating all synthetic voices available to the browser into a fingerprint.
  
-## Use
-```javascript
-fingerprint().then((result) => {
-  console.log(result.fingerprints, result.profile);
-});
-```
-
  ## Specialty Fingerprints
  OPFS returns multiple fingerprints accessible via `result.fingerprints`. 
   * `result.fingerprints.uniqueFp` uses all available fingerprints and is most useful when you value uniqueness over persistence. While this fingerprint is unlikely to change often, it will still change eventually as browsers are updated.
