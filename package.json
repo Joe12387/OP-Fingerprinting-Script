@@ -1,0 +1,29 @@
+{
+  "name": "op-fingerprinting-script",
+  "version": "1.0.0",
+  "description": "An overpowered JavaScript browser fingerprinting library for creating persistent, unique and long-lasting digital fingerprints.",
+  "main": "dist/opfs.js",
+  "types": "dist",
+  "typings": "dist/opfs.d.ts",
+  "scripts": {
+    "build": "tsc -p . && npx uglify-js ./dist/opfs.js -o ./dist/opfs.min.js && cp ./dist/{opfs.js,opfs.min.js} ."
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joe12387/OP-Fingerprinting-Script.git"
+  },
+  "keywords": [
+    "fingerprinting"
+  ],
+  "author": "Joe12387",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.6.4",
+    "uglify-js": "^3.17.1"
+  },
+  "dependencies": {}
+}

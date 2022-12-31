@@ -1,9 +1,9 @@
 /**
  *
- * Overpowered Browser Fingerprinting Script v1.0.0b - (c) 2022 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
+ * Overpowered Browser Fingerprinting Script v1.0.0 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
  *
  **/
- export const fingerprint = function() {
+const fingerprint = function() {
   function murmurhash3_32_gc(key: any, seed: number) {
     let remainder = key.length & 3;
     let bytes = key.length - remainder;
@@ -578,7 +578,7 @@
 
           function populateVoiceList() {
             let voices = synth.getVoices();
-            let output = [];
+            let output = [] as any;
             for (let i = 0; i < voices.length; i++) {
               let voice = voices[i];
               output.push([voice.name, voice.voiceURI, voice.default, voice.lang, voice.localService]);
@@ -921,7 +921,7 @@
             new Function('try{[...undefined].length;return -1}catch(e){return e.message}'),
             new Function('try{var x=new Array(-1);return -1}catch(e){return e.message}'),
           ];
-          let err = [];
+          let err = new Array();
           for (let i = 0; i < errorTests.length; i++) {
             try {
               let tmp = errorTests[i]();
@@ -1000,18 +1000,11 @@
               // console.log(res);
               resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
             }).catch((res) => {
-              console.log(res);
+              // console.log(res);
               resolve([-4, null]);
             });
           });
       },
-      // numberFormat: () => {
-      //   return new Promise((resolve) => {
-      //     if (typeof window.Intl.NumberFormat !== "function") resolve([-1, null]);
-      //     if (typeof window.Intl.NumberFormat().format !== "function") resolve([-2, null]);
-      //     resolve([0, window.Intl.NumberFormat().format(1000000.01)]);
-      //   });
-      // }
     } as any;
 
     let index = [] as any;
