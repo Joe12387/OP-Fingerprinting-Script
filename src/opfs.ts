@@ -570,7 +570,7 @@ const fingerprint = function() {
       },
       speechSynthesis: function() {
         return new Promise(function(resolve) {
-          if (isBrave() || isFirefox()) resolve([-1, null]);
+          if (isBrave() || isFirefox() || isSafari()) resolve([-1, null]);
 
           let tripped = false;
           let synth = window.speechSynthesis;
