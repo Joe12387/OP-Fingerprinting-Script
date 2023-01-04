@@ -542,7 +542,7 @@ var fingerprint = function () {
             },
             speechSynthesis: function () {
                 return new Promise(function (resolve) {
-                    if (isBrave() || isFirefox())
+                    if (isBrave() || isFirefox() || isSafari())
                         resolve([-1, null]);
                     var tripped = false;
                     var synth = window.speechSynthesis;
