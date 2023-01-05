@@ -1,6 +1,6 @@
 {
   "name": "op-fingerprinting-script",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An overpowered JavaScript browser fingerprinting library for creating persistent, unique and long-lasting digital fingerprints.",
   "main": "dist/opfs.js",
   "types": "dist",

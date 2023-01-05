@@ -1,9 +1,9 @@
 /**
  *
- * Overpowered Browser Fingerprinting Script v1.0.1b - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
+ * Overpowered Browser Fingerprinting Script v1.0.1 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
  *
  **/
-const fingerprint = function(): Promise<any> {
+const fingerprint = (): Promise<any> => {
   function murmurhash3_32_gc(key: any, seed: number): number {
     const remainder = key.length & 3;
     const bytes = key.length - remainder;
@@ -536,7 +536,7 @@ const fingerprint = function(): Promise<any> {
         });
       },
       performance: function(): Promise<any[]> {
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve): void {
           if (!isChrome()) resolve([-1, null]);
 
           const perf = window.performance;
@@ -553,7 +553,7 @@ const fingerprint = function(): Promise<any> {
 
           for (let i = 0; i < 5000; i++) {
             if ((now = newNow) < (newNow = perf.now())) {
-              let difference = newNow - now;
+              const difference = newNow - now;
               if (difference > valueA) {
                 if (difference < valueB) {
                   valueB = difference;
@@ -569,14 +569,14 @@ const fingerprint = function(): Promise<any> {
         });
       },
       speechSynthesis: function(): Promise<any[]> {
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve): void {
           if (isBrave() || isFirefox() || isSafari()) resolve([-1, null]);
 
           let tripped = false;
           const synth = window.speechSynthesis;
           if (synth === undefined) resolve([-2, null]);
 
-          function populateVoiceList() {
+          function populateVoiceList(): void {
             const voices = synth.getVoices();
             let output = [] as any;
             for (let i = 0; i < voices.length; i++) {
@@ -596,7 +596,7 @@ const fingerprint = function(): Promise<any> {
         });
       },
       applePay: function(): Promise<any[]> {
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve): void {
           // let ap = (window as any).ApplePaySession;
           if (typeof (window as any).ApplePaySession !== "function") resolve([-1, null]);
           const enabled = (window as any).ApplePaySession.canMakePayments();
@@ -614,7 +614,7 @@ const fingerprint = function(): Promise<any> {
         });
       },
       webglInfo: function(): Promise<any[]> {
-        return new Promise(function(resolve) {
+        return new Promise(function(resolve): void {
           const canvas = document.createElement('canvas');
 
           try {
@@ -901,7 +901,7 @@ const fingerprint = function(): Promise<any> {
             try {
               const tmp = e.toSource();
               resolve([0, true]);
-           } catch (ee) {
+           } catch (ee: any) {
               resolve([0, false]); 
             }
           }
