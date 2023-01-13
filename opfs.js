@@ -290,7 +290,7 @@ var fingerprint = function () {
                         "ucweb",
                         "UCShellJava",
                         "puffinDevice",
-                        "opr"
+                        "opr",
                     ];
                     for (var i = 0; i < objects.length; i++) {
                         if (typeof window[objects[i]] === "object")
@@ -930,7 +930,7 @@ var fingerprint = function () {
                         m.exp(1) - 1,
                         (m.log1p || returnZero)(10),
                         m.log(11),
-                        m.pow(m.PI, -100)
+                        m.pow(m.PI, -100),
                     ];
                     resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
                 });
