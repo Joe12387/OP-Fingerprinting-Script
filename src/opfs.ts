@@ -3,8 +3,15 @@
  * Overpowered Browser Fingerprinting Script v1.0.2 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
  *
  **/
-const fingerprint = (): Promise<any> => {
-  function murmurhash3_32_gc(key: any, seed: number): number {
+const fingerprint = (): Promise<{
+  fingerprint: number;
+  fingerprints: {
+    uniqueFp: number;
+    persistentFp: number;
+  };
+  profile: any[];
+}> => {
+  function murmurhash3_32_gc(key: string, seed: number): number {
     const remainder = key.length & 3;
     const bytes = key.length - remainder;
     let h1 = seed;
@@ -91,9 +98,9 @@ const fingerprint = (): Promise<any> => {
     return isChrome() && (navigator as any).brave !== undefined;
   }
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject): void {
     const fingerprints = {
-      platform: (): Promise<any[]> => {
+      platform: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const np = navigator.platform;
           if (np === undefined) {
@@ -103,7 +110,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      vendor: (): Promise<any[]> => {
+      vendor: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const nv = navigator.vendor;
           if (nv === undefined) {
@@ -113,7 +120,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      productSub: (): Promise<any[]> => {
+      productSub: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const ps = navigator.productSub;
           if (ps === undefined) {
@@ -123,7 +130,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      colorDepth: (): Promise<any[]> => {
+      colorDepth: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const cd = window.screen.colorDepth;
           if (cd === undefined) {
@@ -133,7 +140,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      devicePixelRatio: (): Promise<any[]> => {
+      devicePixelRatio: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isChrome() && !isBrave()) resolve([-2, null]);
           const dpr = window.devicePixelRatio;
@@ -144,14 +151,14 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      evalToString: (): Promise<any[]> => {
+      evalToString: (): Promise<[number, number]> => {
         return Promise.resolve([0, eval.toString().length]);
       },
-      maxTouchPoints: (): Promise<any[]> => {
+      maxTouchPoints: (): Promise<[number, any]> => {
         const n = navigator as any;
         return Promise.resolve(n.maxTouchPoints !== undefined ? [0, n.maxTouchPoints] : n.msMaxTouchPoints !== undefined ? [1, n.msMaxTouchPoints] : [-1, null]);
       },
-      cpuClass: (): Promise<any[]> => {
+      cpuClass: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const cpu = (navigator as any).cpuClass;
           if (cpu === undefined) {
@@ -161,7 +168,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      hardwareConcurrency: (): Promise<any[]> => {
+      hardwareConcurrency: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave() || isFirefoxResistFingerprinting()) {
             return resolve([-2, null]);
@@ -174,7 +181,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      deviceMemory: (): Promise<any[]> => {
+      deviceMemory: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave()) {
             return resolve([-2, null]);
@@ -187,7 +194,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      oscpu: (): Promise<any[]> => {
+      oscpu: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const os = (navigator as any).oscpu;
           if (os === undefined) {
@@ -197,7 +204,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      doNotTrack: (): Promise<any[]> => {
+      doNotTrack: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isFirefoxResistFingerprinting()) resolve([-2, null]);
           const dnt = navigator.doNotTrack;
@@ -208,10 +215,10 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      sourceBuffer: (): Promise<any[]> => {
+      sourceBuffer: (): Promise<[number, string[]]> => {
         return Promise.resolve([0, [typeof SourceBuffer, typeof SourceBufferList]]);
       },
-      colorGamut: (): Promise<any[]> => {
+      colorGamut: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const colorGamuts = ["rec2020", "p3", "srgb"];
 
@@ -223,7 +230,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      reducedMotion: (): Promise<any[]> => {
+      reducedMotion: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function prm(x: string): boolean {
             return Boolean(matchMedia("(prefers-reduced-motion: " + x + ")").matches);
@@ -231,7 +238,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, prm("reduce") || !prm("no-preference")]);
         });
       },
-      hdr: (): Promise<any[]> => {
+      hdr: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function dr(x: string): boolean {
             return Boolean(matchMedia("(dynamic-range: " + x + ")").matches);
@@ -239,7 +246,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, dr("high") || !dr("standard")]);
         });
       },
-      contrast: (): Promise<any[]> => {
+      contrast: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function pc(x: string): boolean {
             return Boolean(matchMedia("(prefers-contrast: " + x + ")").matches);
@@ -247,7 +254,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, pc("no-preference") ? 0 : pc("high") || pc("more") ? 1 : pc("low") || pc("less") ? -1 : pc("forced") ? 10 : -1]);
         });
       },
-      invertedColors: (): Promise<any[]> => {
+      invertedColors: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function ic(x: string): boolean {
             return Boolean(matchMedia("(inverted-colors: " + x + ")").matches);
@@ -255,7 +262,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, ic("inverted") || !ic("none")]);
         });
       },
-      forcedColors: (): Promise<any[]> => {
+      forcedColors: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function fc(x: string): boolean {
             return Boolean(matchMedia("(forced-colors: " + x + ")").matches);
@@ -263,7 +270,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, fc("active") || !fc("none")]);
         });
       },
-      monochrome: (): Promise<any[]> => {
+      monochrome: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (matchMedia("(min-monochrome: 0)").matches) {
             for (let i = 0; i <= 100; ++i) {
@@ -274,7 +281,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      browserObjects: (): Promise<any[]> => {
+      browserObjects: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const foundObjects = [] as string[];
 
@@ -294,7 +301,7 @@ const fingerprint = (): Promise<any> => {
             "ucweb",
             "UCShellJava",
             "puffinDevice",
-            "opr"
+            "opr",
           ] as string[];
 
           for (let i = 0; i < objects.length; i++) {
@@ -304,7 +311,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, foundObjects.sort()]);
         });
       },
-      timezone: (): Promise<any[]> => {
+      timezone: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const intl = window.Intl;
           const date = intl.DateTimeFormat;
@@ -317,13 +324,13 @@ const fingerprint = (): Promise<any> => {
           resolve([1, "UTC" + (utc >= 0 ? "+" : "-") + Math.abs(utc)]);
         });
       },
-      timezoneOffset: (): Promise<any[]> => {
+      timezoneOffset: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const year = (new Date).getFullYear();
           resolve([0, -Math.max(parseFloat(String(new Date(year, 0, 1).getTimezoneOffset())), parseFloat(String(new Date(year, 6, 1).getTimezoneOffset())))]);
         });
       },
-      language: (): Promise<any[]> => {
+      language: (): Promise<[number, string[]]> => {
         return new Promise((resolve): void => {
           const n = navigator as any;
           const lang_str = n.language || n.userLanguage || n.browserLanguage || n.systemLanguage;
@@ -336,14 +343,14 @@ const fingerprint = (): Promise<any> => {
           resolve([0, [lang_str, lang_arr]]);
         });
       },
-      screenResolution: (): Promise<any[]> => {
+      screenResolution: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isFirefoxResistFingerprinting()) resolve([-1, null]);
           if (isChrome() && !isBrave()) resolve([-2, null]);
           resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
         });
     },
-      jsHeapSizeLimit: (): Promise<any[]> => {
+      jsHeapSizeLimit: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const perf = window.performance as any;
           if (perf == undefined) resolve([-1, null]);
@@ -354,7 +361,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, jsHeapSizeLimit]);
         });
       },
-      audioContext: (): Promise<any[]> => {
+      audioContext: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave()) resolve([-1, null]);
 
@@ -393,7 +400,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      userAgentData: (): Promise<any[]> => {
+      userAgentData: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function parseBrand(arr: any[]): string[] {
             const brands = [] as string[];
@@ -417,7 +424,7 @@ const fingerprint = (): Promise<any> => {
           });
         });
       },
-      canvasAPI: (): Promise<any[]> => {
+      canvasAPI: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() || isFirefoxResistFingerprinting()) resolve([-1, null]);
 
@@ -535,7 +542,7 @@ const fingerprint = (): Promise<any> => {
           }]);
         });
       },
-      performance: (): Promise<any[]> => {
+      performance: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (!isChrome()) resolve([-1, null]);
 
@@ -568,7 +575,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, valueA]);
         });
       },
-      speechSynthesis: (): Promise<any[]> => {
+      speechSynthesis: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave() || isFirefox() || isSafari()) resolve([-1, null]);
 
@@ -595,7 +602,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      applePay: (): Promise<any[]> => {
+      applePay: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           // let ap = (window as any).ApplePaySession;
           if (typeof (window as any).ApplePaySession !== "function") resolve([-1, null]);
@@ -603,7 +610,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, enabled]);
         });
       },
-      attributionsourceid: (): Promise<any[]> => {
+      attributionsourceid: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const a = (document.createElement("a") as any).attributionsourceid;
           if (a !== undefined) {
@@ -613,7 +620,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      webglInfo: (): Promise<any[]> => {
+      webglInfo: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const canvas = document.createElement('canvas');
 
@@ -652,7 +659,7 @@ const fingerprint = (): Promise<any> => {
             output.parameters.push(parameterNames[i] + "=" + context.getParameter(context[parameterNames[i]]));
           }
 
-          function getShaderPrecision(shaderType: string, precisionType: string) {
+          function getShaderPrecision(shaderType: string, precisionType: string): any[] {
             const shaderPrecision = context.getShaderPrecisionFormat(context[shaderType], context[precisionType]);
             return [shaderPrecision.rangeMin, shaderPrecision.rangeMax, shaderPrecision.precision];
           }
@@ -732,7 +739,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, output]);
         });
       },
-      webglProgram: (): Promise<any[]> => {
+      webglProgram: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave() || isFirefoxResistFingerprinting()) resolve([-3, null]);
 
@@ -775,7 +782,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, murmurhash3_32_gc(canvas.toDataURL(), 420)]);
         });
       },
-      fonts: (): Promise<any[]> => {
+      fonts: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave()) resolve([-1, null]);
 
@@ -785,7 +792,7 @@ const fingerprint = (): Promise<any> => {
           const list = [] as string[];
           const baseFonts = ['monospace', 'sans-serif', 'serif'] as string[];
 
-          const body = document.getElementsByTagName("body")[0] as any;
+          const body = document.getElementsByTagName("body")[0] as Element;
 
           const span = document.createElement("span") as any;
           span.style.fontSize = "72px";
@@ -830,7 +837,7 @@ const fingerprint = (): Promise<any> => {
           });
         });
       },
-      plugins: (): Promise<any[]> => {
+      plugins: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isChrome()) resolve([-1, null]);
           const plugins = (navigator as any).plugins;
@@ -858,14 +865,14 @@ const fingerprint = (): Promise<any> => {
           resolve([0, output]);
         });
       },
-      pluginLengthIsZero: (): Promise<any[]> => {
+      pluginLengthIsZero: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const plugins = (navigator as any).plugins;
           if (plugins === undefined) resolve([-1, null]);
           resolve([0, plugins.length === 0]);
         });
       },
-      sharedArrayBuffer: (): Promise<any[]> => {
+      sharedArrayBuffer: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (typeof window.SharedArrayBuffer === "function") {
             const sab = new window.SharedArrayBuffer(1);
@@ -877,7 +884,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      webdriver: (): Promise<any[]> => {
+      webdriver: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const webd = navigator.webdriver;
           if (webd === undefined) {
@@ -887,7 +894,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      getAttributeNames: (): Promise<any[]> => {
+      getAttributeNames: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const de = document.documentElement;
           if (de === undefined) resolve([-1, null]);
@@ -895,7 +902,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, de.getAttributeNames().length > 0]);
         });
       },
-      errorToSource: (): Promise<any[]> => {
+      errorToSource: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           try {
             throw "lol";
@@ -910,7 +917,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      errors: (): Promise<any[]> => {
+      errors: (): Promise<[number, any[]]> => {
         return new Promise((resolve): void => {
           const errorTests = [
             () => new Function('alert(")'),
@@ -934,10 +941,10 @@ const fingerprint = (): Promise<any> => {
           resolve([0, err]);
         });
       },
-      installTrigger: (): Promise<any[]> => {
+      installTrigger: (): Promise<[number, boolean]> => {
         return Promise.resolve([0, (window as any).InstallTrigger !== undefined]);
       },
-      rtt: (): Promise<any[]> => {
+      rtt: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const con = (navigator as any).connection;
           if (con === undefined) resolve([-1, null]);
@@ -946,7 +953,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, rtt === 0]);
         });
       },
-      math: (): Promise<any[]> => {
+      math: (): Promise<[number, number]> => {
         return new Promise((resolve): void => {
           const m = Math;
 
@@ -980,13 +987,13 @@ const fingerprint = (): Promise<any> => {
             m.exp(1) - 1,
             (m.log1p || returnZero)(10),
             m.log(11),
-            m.pow(m.PI, -100)
+            m.pow(m.PI, -100),
           ];
       
           resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
         });
       },
-      notifications: (): Promise<any[]> => {
+      notifications: (): Promise<[number, any]> => {
           return new Promise((resolve): void => {
             if (window.Notification === undefined) {
               resolve([-1, null]);
@@ -997,10 +1004,10 @@ const fingerprint = (): Promise<any> => {
             if (typeof navigator.permissions.query !== "function") {
               resolve([-3, null]);
             }
-            navigator.permissions.query({name: "notifications"}).then((res) => {
+            navigator.permissions.query({name: "notifications"}).then((res): void => {
               // console.log(res);
               resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
-            }).catch((res) => {
+            }).catch((res): void => {
               // console.log(res);
               resolve([-4, null]);
             });
@@ -1009,7 +1016,7 @@ const fingerprint = (): Promise<any> => {
     } as any;
 
     const index = [] as string[];
-    const promises = [] as any[];
+    const promises = [] as Promise<any>[];
     for (const method in fingerprints) {
       index.push(method);
       // console.log(method);
@@ -1018,7 +1025,7 @@ const fingerprint = (): Promise<any> => {
       promises.push(exe);
     }
 
-    Promise.all(promises).then((k) => {
+    Promise.all(promises).then((k): void => {
       const profile = {} as any;
       for (let i = 0; i < index.length; i++) {
         profile[index[i]] = k[i];
