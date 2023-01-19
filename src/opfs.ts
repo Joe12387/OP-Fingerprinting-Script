@@ -3,8 +3,15 @@
  * Overpowered Browser Fingerprinting Script v1.0.2 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
  *
  **/
-const fingerprint = (): Promise<any> => {
-  function murmurhash3_32_gc(key: any, seed: number): number {
+const fingerprint = (): Promise<{
+  fingerprint: number;
+  fingerprints: {
+    uniqueFp: number;
+    persistentFp: number;
+  };
+  profile: any[];
+}> => {
+  function murmurhash3_32_gc(key: string, seed: number): number {
     const remainder = key.length & 3;
     const bytes = key.length - remainder;
     let h1 = seed;
@@ -91,9 +98,9 @@ const fingerprint = (): Promise<any> => {
     return isChrome() && (navigator as any).brave !== undefined;
   }
 
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject): void => {
     const fingerprints = {
-      platform: (): Promise<any[]> => {
+      platform: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const np = navigator.platform;
           if (np === undefined) {
@@ -103,7 +110,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      vendor: (): Promise<any[]> => {
+      vendor: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const nv = navigator.vendor;
           if (nv === undefined) {
@@ -113,7 +120,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      productSub: (): Promise<any[]> => {
+      productSub: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const ps = navigator.productSub;
           if (ps === undefined) {
@@ -123,7 +130,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      colorDepth: (): Promise<any[]> => {
+      colorDepth: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const cd = window.screen.colorDepth;
           if (cd === undefined) {
@@ -133,7 +140,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      devicePixelRatio: (): Promise<any[]> => {
+      devicePixelRatio: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isChrome() && !isBrave()) resolve([-2, null]);
           const dpr = window.devicePixelRatio;
@@ -144,14 +151,14 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      evalToString: (): Promise<any[]> => {
+      evalToString: (): Promise<[number, number]> => {
         return Promise.resolve([0, eval.toString().length]);
       },
-      maxTouchPoints: (): Promise<any[]> => {
+      maxTouchPoints: (): Promise<[number, any]> => {
         const n = navigator as any;
         return Promise.resolve(n.maxTouchPoints !== undefined ? [0, n.maxTouchPoints] : n.msMaxTouchPoints !== undefined ? [1, n.msMaxTouchPoints] : [-1, null]);
       },
-      cpuClass: (): Promise<any[]> => {
+      cpuClass: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const cpu = (navigator as any).cpuClass;
           if (cpu === undefined) {
@@ -161,7 +168,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      hardwareConcurrency: (): Promise<any[]> => {
+      hardwareConcurrency: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave() || isFirefoxResistFingerprinting()) {
             return resolve([-2, null]);
@@ -174,7 +181,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      deviceMemory: (): Promise<any[]> => {
+      deviceMemory: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave()) {
             return resolve([-2, null]);
@@ -187,7 +194,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      oscpu: (): Promise<any[]> => {
+      oscpu: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const os = (navigator as any).oscpu;
           if (os === undefined) {
@@ -197,7 +204,7 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      doNotTrack: (): Promise<any[]> => {
+      doNotTrack: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isFirefoxResistFingerprinting()) resolve([-2, null]);
           const dnt = navigator.doNotTrack;
@@ -208,10 +215,10 @@ const fingerprint = (): Promise<any> => {
           }
         });        
       },
-      sourceBuffer: (): Promise<any[]> => {
+      sourceBuffer: (): Promise<[number, string[]]> => {
         return Promise.resolve([0, [typeof SourceBuffer, typeof SourceBufferList]]);
       },
-      colorGamut: (): Promise<any[]> => {
+      colorGamut: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const colorGamuts = ["rec2020", "p3", "srgb"];
 
@@ -223,7 +230,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      reducedMotion: (): Promise<any[]> => {
+      reducedMotion: (): Promise<[number, boolean]> => {
         return new Promise((resolve): void => {
           function prm(x: string): boolean {
             return Boolean(matchMedia("(prefers-reduced-motion: " + x + ")").matches);
@@ -231,7 +238,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, prm("reduce") || !prm("no-preference")]);
         });
       },
-      hdr: (): Promise<any[]> => {
+      hdr: (): Promise<[number, boolean]> => {
         return new Promise((resolve): void => {
           function dr(x: string): boolean {
             return Boolean(matchMedia("(dynamic-range: " + x + ")").matches);
@@ -239,7 +246,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, dr("high") || !dr("standard")]);
         });
       },
-      contrast: (): Promise<any[]> => {
+      contrast: (): Promise<[number, number]> => {
         return new Promise((resolve): void => {
           function pc(x: string): boolean {
             return Boolean(matchMedia("(prefers-contrast: " + x + ")").matches);
@@ -247,7 +254,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, pc("no-preference") ? 0 : pc("high") || pc("more") ? 1 : pc("low") || pc("less") ? -1 : pc("forced") ? 10 : -1]);
         });
       },
-      invertedColors: (): Promise<any[]> => {
+      invertedColors: (): Promise<[number, boolean]> => {
         return new Promise((resolve): void => {
           function ic(x: string): boolean {
             return Boolean(matchMedia("(inverted-colors: " + x + ")").matches);
@@ -255,7 +262,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, ic("inverted") || !ic("none")]);
         });
       },
-      forcedColors: (): Promise<any[]> => {
+      forcedColors: (): Promise<[number, boolean]> => {
         return new Promise((resolve): void => {
           function fc(x: string): boolean {
             return Boolean(matchMedia("(forced-colors: " + x + ")").matches);
@@ -263,7 +270,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, fc("active") || !fc("none")]);
         });
       },
-      monochrome: (): Promise<any[]> => {
+      monochrome: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (matchMedia("(min-monochrome: 0)").matches) {
             for (let i = 0; i <= 100; ++i) {
@@ -274,7 +281,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      browserObjects: (): Promise<any[]> => {
+      browserObjects: (): Promise<[number, string[]]> => {
         return new Promise((resolve): void => {
           const foundObjects = [] as string[];
 
@@ -294,7 +301,7 @@ const fingerprint = (): Promise<any> => {
             "ucweb",
             "UCShellJava",
             "puffinDevice",
-            "opr"
+            "opr",
           ] as string[];
 
           for (let i = 0; i < objects.length; i++) {
@@ -304,7 +311,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, foundObjects.sort()]);
         });
       },
-      timezone: (): Promise<any[]> => {
+      timezone: (): Promise<[number, string]> => {
         return new Promise((resolve): void => {
           const intl = window.Intl;
           const date = intl.DateTimeFormat;
@@ -317,13 +324,13 @@ const fingerprint = (): Promise<any> => {
           resolve([1, "UTC" + (utc >= 0 ? "+" : "-") + Math.abs(utc)]);
         });
       },
-      timezoneOffset: (): Promise<any[]> => {
+      timezoneOffset: (): Promise<[number, number]> => {
         return new Promise((resolve): void => {
           const year = (new Date).getFullYear();
           resolve([0, -Math.max(parseFloat(String(new Date(year, 0, 1).getTimezoneOffset())), parseFloat(String(new Date(year, 6, 1).getTimezoneOffset())))]);
         });
       },
-      language: (): Promise<any[]> => {
+      language: (): Promise<[number, string[]]> => {
         return new Promise((resolve): void => {
           const n = navigator as any;
           const lang_str = n.language || n.userLanguage || n.browserLanguage || n.systemLanguage;
@@ -336,14 +343,14 @@ const fingerprint = (): Promise<any> => {
           resolve([0, [lang_str, lang_arr]]);
         });
       },
-      screenResolution: (): Promise<any[]> => {
+      screenResolution: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isFirefoxResistFingerprinting()) resolve([-1, null]);
           if (isChrome() && !isBrave()) resolve([-2, null]);
           resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
         });
-    },
-      jsHeapSizeLimit: (): Promise<any[]> => {
+      },
+      jsHeapSizeLimit: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const perf = window.performance as any;
           if (perf == undefined) resolve([-1, null]);
@@ -354,7 +361,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, jsHeapSizeLimit]);
         });
       },
-      audioContext: (): Promise<any[]> => {
+      audioContext: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave()) resolve([-1, null]);
 
@@ -393,7 +400,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      userAgentData: (): Promise<any[]> => {
+      userAgentData: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           function parseBrand(arr: any[]): string[] {
             const brands = [] as string[];
@@ -412,12 +419,12 @@ const fingerprint = (): Promise<any> => {
           const uad = (navigator as any).userAgentData;
           if (!uad) resolve([-1, null]);
           if (typeof uad.getHighEntropyValues !== "function") resolve([-2, null]);
-          uad.getHighEntropyValues(["brands", "mobile", "platform", "architecture", "bitness", "model"]).then(function(s: any) {
+          uad.getHighEntropyValues(["brands", "mobile", "platform", "architecture", "bitness", "model"]).then((s: any): void => {
             resolve([0, [parseBrand(s.brands), s.mobile, s.platform, s.architecture, s.bitness, s.model]]);
           });
         });
       },
-      canvasAPI: (): Promise<any[]> => {
+      canvasAPI: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() || isFirefoxResistFingerprinting()) resolve([-1, null]);
 
@@ -522,20 +529,20 @@ const fingerprint = (): Promise<any> => {
           resolve([0, {
             "geometry": {
               "hash": canvas_geometry_fp,
-              "winding": geometry_winding
+              "winding": geometry_winding,
             },
             "text": {
               "hash": canvas_text_fp,
-              "winding": text_winding
+              "winding": text_winding,
             },
             "combined": {
               "hash": canvas_combined_fp,
-              "winding": combined_winding
-            }
+              "winding": combined_winding,
+            },
           }]);
         });
       },
-      performance: (): Promise<any[]> => {
+      performance: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (!isChrome()) resolve([-1, null]);
 
@@ -568,7 +575,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, valueA]);
         });
       },
-      speechSynthesis: (): Promise<any[]> => {
+      speechSynthesis: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave() || isFirefox() || isSafari()) resolve([-1, null]);
 
@@ -578,7 +585,7 @@ const fingerprint = (): Promise<any> => {
 
           function populateVoiceList(): void {
             const voices = synth.getVoices();
-            const output = [] as any;
+            const output = [] as any[];
             for (let i = 0; i < voices.length; i++) {
               const voice = voices[i];
               output.push([voice.name, voice.voiceURI, voice.default, voice.lang, voice.localService]);
@@ -595,7 +602,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      applePay: (): Promise<any[]> => {
+      applePay: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           // let ap = (window as any).ApplePaySession;
           if (typeof (window as any).ApplePaySession !== "function") resolve([-1, null]);
@@ -603,7 +610,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, enabled]);
         });
       },
-      attributionsourceid: (): Promise<any[]> => {
+      attributionsourceid: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const a = (document.createElement("a") as any).attributionsourceid;
           if (a !== undefined) {
@@ -613,7 +620,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      webglInfo: (): Promise<any[]> => {
+      webglInfo: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const canvas = document.createElement('canvas');
 
@@ -652,7 +659,7 @@ const fingerprint = (): Promise<any> => {
             output.parameters.push(parameterNames[i] + "=" + context.getParameter(context[parameterNames[i]]));
           }
 
-          function getShaderPrecision(shaderType: string, precisionType: string) {
+          function getShaderPrecision(shaderType: string, precisionType: string): any[] {
             const shaderPrecision = context.getShaderPrecisionFormat(context[shaderType], context[precisionType]);
             return [shaderPrecision.rangeMin, shaderPrecision.rangeMax, shaderPrecision.precision];
           }
@@ -732,7 +739,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, output]);
         });
       },
-      webglProgram: (): Promise<any[]> => {
+      webglProgram: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isBrave() || isFirefoxResistFingerprinting()) resolve([-3, null]);
 
@@ -775,9 +782,9 @@ const fingerprint = (): Promise<any> => {
           resolve([0, murmurhash3_32_gc(canvas.toDataURL(), 420)]);
         });
       },
-      fonts: (): Promise<any[]> => {
+      fonts: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isBrave()) resolve([-1, null]);
+          // if (isBrave()) resolve([-1, null]);
 
           const fontMode = (isSafari() && !isFirefox()) || isMSIE();
           const fontList = fontMode ? ["fakefont", "Apple Color Emoji", "sans-serif-thin", "ARNO PRO", "Agency FB", "Arabic Typesetting", "Arial Unicode MS", "AvantGarde Bk BT", "BankGothic Md BT", "Batang", "Bitstream Vera Sans Mono", "Calibri", "Century", "Century Gothic", "Clarendon", "EUROSTILE", "Franklin Gothic", "Futura Bk BT", "Futura Md BT", "GOTHAM", "Gill Sans", "HELV", "Haettenschweiler", "Helvetica Neue", "Humanst521 BT", "Leelawadee", "Letter Gothic", "Levenim MT", "Lucida Bright", "Lucida Sans", "Menlo", "MS Mincho", "MS Outlook", "MS Reference Specialty", "MS UI Gothic", "MT Extra", "MYRIAD PRO", "Marlett", "Meiryo UI", "Microsoft Uighur", "Minion Pro", "Monotype Corsiva", "PMingLiU", "Pristina", "SCRIPTINA", "Segoe UI Light", "Serifa", "SimHei", "Small Fonts", "Staccato222 BT", "TRAJAN PRO", "Univers CE 55 Medium", "Vrinda", "ZWAdobeF", "Bauhaus 93", "FORTE", "Book Antiqua", "Liberation Sans", "Liberation Serif", "Liberation Mono", "Liberation Sans Narrow", "Droid Naskh Shift", "Droid Naskh Shift Alt", "Droid Naskh System UI", "Droid Naskh UI", "Droid Robot Regular", "Droid Sans", "Droid Sans Fallback", "Droid Sans Hebrew", "Droid Sans Japanese", "Droid Sans Mono", "Droid Sans Thai", "Droid Serif", "DroidSansFallback", "Noto Naskh Arabic", "Ubuntu Mono derivative Powerline", "Ubuntu Mono derivative Powerline Bold", "Ubuntu Mono derivative Powerline Bold Italic", "Ubuntu Mono derivative Powerline Italic", "Adobe Caslon", "Adobe Caslon Pro", "Adobe Caslon Pro Bold", "Adobe Devanagari", "Adobe Fan Heiti Std B", "Adobe Fangsong Std", "Adobe Fangsong Std R", "Adobe Garamond", "Adobe Garamond Pro", "Adobe Garamond Pro Bold", "Adobe Gothic Std", "Adobe Gothic Std B", "Adobe Hebrew", "Adobe Heiti Std R", "Adobe Jenson", "Adobe Kaiti Std R", "Adobe Ming Std L", "Adobe Myungjo Std M", "Adobe Naskh Medium", "Adobe Song Std L", "Orator Std Slanted", "Poplar Std", "Prestige Elite Std Bd", "Rosewood Std Regular", "Giddyup Std", "Hobo Std", "Hobo Std Medium", "Birch Std", "Blackoak Std", "TeamViewer13", "TeamViewer14", "TeamViewer15", "TeamViewer16"] : ["fakefont", "TeamViewer10", "TeamViewer11", "TeamViewer12", "TeamViewer13", "TeamViewer7", "TeamViewer8", "TeamViewer9", ".Mondulkiri U GR 1.5", "AIGDT", "AMGDT", "Abel", "Aboriginal Sans", "Aboriginal Serif", "Abyssinica SIL", "AcadEref", "Acumin", "Adobe Arabic", "Adobe Caslon", "Adobe Caslon Pro", "Adobe Caslon Pro Bold", "Adobe Devanagari", "Adobe Fan Heiti Std B", "Adobe Fangsong Std", "Adobe Fangsong Std R", "Adobe Garamond", "Adobe Garamond Pro", "Adobe Garamond Pro Bold", "Adobe Gothic Std", "Adobe Gothic Std B", "Adobe Hebrew", "Adobe Heiti Std R", "Adobe Jenson", "Adobe Kaiti Std R", "Adobe Ming Std L", "Adobe Myungjo Std M", "Adobe Naskh Medium", "Adobe Song Std L", "Agency FB", "Aharoni", "Akaash", "Akshar Unicode", "AksharUnicode", "Al Bayan", "Alexandra Script", "Algerian", "Amadeus", "AmdtSymbols", "AnastasiaScript", "Andale Mono", "Andalus", "Angsana New", "AngsanaUPC", "AnjaliOldLipi", "Annabelle", "Aparajita", "Apple Casual", "Apple Chancery", "Apple Color Emoji", "Apple SD Gothic Neo", "AppleGothic", "AppleMyungjo", "Arabic Transparent", "Arabic Typesetting", "Arial", "Arial AMU", "Arial Baltic", "Arial CE", "Arial CYR", "Arial Cyr", "Arial Greek", "Arial Hebrew", "Arial MT", "Arial Rounded MT Bold", "Arial TUR", "Arial Unicode MS", "Ariston", "Arno Pro", "Arno Pro Caption", "Arno Pro Display", "Arno Pro Light Display", "Arno Pro SmText", "Arno Pro Smbd", "Arno Pro Smbd Caption", "Arno Pro Smbd Display", "Arno Pro Smbd SmText", "Arno Pro Smbd Subhead", "Arno Pro Subhead", "Asana Math", "Ayuthaya", "BJCree Uni", "BPG Classic 99U", "BPG Paata Khutsuri U", "Bangla MN", "Bangla Sangam MN", "BankGothic Lt BT", "BankGothic Md BT", "Baskerville Old Face", "Batang", "BatangChe", "Bauhaus 93", "Bell Gothic Std Black", "Bell Gothic Std Light", "Bell MT", "Berlin Sans FB", "Berlin Sans FB Demi", "Bernard MT Condensed", "Bickham Script One", "Bickham Script Pro Regular", "Bickham Script Pro Semibold", "Bickham Script Two", "Birch Std", "Bitstream Vera Sans Mono", "Blackadder ITC", "Blackoak Std", "Bernard Condensed", "Bodoni MT", "Bodoni MT Black", "Bodoni MT Poster Compressed", "Book Antiqua", "Bookman Old Style", "Bookshelf Symbol 7", "Bradley Hand ITC", "Britannic Bold", "Broadway", "Browallia New", "BrowalliaUPC", "Brush Script MT", "Brush Script Std", "CDT Khmer", "Calibri", "Calibri Light", "Californian FB", "Calisto MT", "Calligraph", "Cambria", "Cambria Math", "Candara", "Carolina", "Castellar", "Centaur", "Century", "Century Gothic", "Century Schoolbook", "Ceremonious Two", "Chaparral Pro", "Chaparral Pro Light", "Charcoal CY", "Charis SIL Compact", "Charlemagne Std", "Chiller", "CityBlueprint", "Clarendon BT", "Clarendon Blk BT", "Clarendon Lt BT", "Clear Sans", "Code2000", "Colonna MT", "Comic Sans", "Comic Sans MS", "CommercialPi BT", "CommercialScript BT", "Complex", "Consolas", "Constantia", "Cooper Black", "Cooper Std Black", "Copperplate Gothic Bold", "Copperplate Gothic Light", "Copyist", "Corbel", "Cordia New", "CordiaUPC", "CountryBlueprint", "Courier", "Courier New", "Courier New Baltic", "Courier New CE", "Courier New CYR", "Courier New Cyr", "Courier New Greek", "Courier New TUR", "Curlz MT", "DFKai-SB", "DaunPenh", "David", "DecoType Naskh", "Decor", "DejaVu Math TeX Gyre", "DejaVu Sans", "DejaVu Sans Condensed", "DejaVu Sans Light", "DejaVu Sans Mono", "DejaVu Serif", "DejaVu Serif Condensed", "Devanagari MT", "Devanagari Sangam MN", "DilleniaUPC", "DokChampa", "Dotum", "DotumChe", "Droid Naskh Shift", "Droid Naskh Shift Alt", "Droid Naskh System UI", "Droid Naskh UI", "Droid Robot Regular", "Droid Sans", "Droid Sans Fallback", "Droid Sans Hebrew", "Droid Sans Japanese", "Droid Sans Mono", "Droid Sans Thai", "Droid Serif", "DroidSansFallback", "Dutch801 Rm BT", "Dutch801 XBd BT", "Ebrima", "Eccentric Std", "Edwardian Script ITC", "Ekushey Punarbhaba", "Elephant", "Engravers MT", "Eras Bold ITC", "Eras Demi ITC", "Eras Light ITC", "Eras Medium ITC", "Estrangelo Edessa", "Ethiopia Jiret", "EucrosiaUPC", "Euphemia", "Euphemia UCAS", "EuroRoman", "Eurostile", "FTEasci1", "FTEasci1-f", "FTEasci2", "FTEasci2-f", "FTEbaudo", "FTEbaudo-f", "FTEebcd1", "FTEebcd1-f", "FTEebcd2", "FTEebcd2-f", "FTEspec", "FTEspec-f", "FangSong", "Felix Titling", "Fira Code", "Fira Mono", "Fira Sans", "Fixed Miriam Transparent", "Fixedsys", "Footlight MT Light", "Forte", "FrankRuehl", "Franklin Gothic Book", "Franklin Gothic Demi", "Franklin Gothic Demi Cond", "Franklin Gothic Heavy", "Franklin Gothic Medium", "Franklin Gothic Medium Cond", "Freehand521 BT", "FreesiaUPC", "Freestyle Script", "French Script MT", "Futura Md BT", "GDT", "GENISO", "GF Zemen Unicode", "Gabriola", "Gadugi", "Garamond", "Garamond Premr Pro", "Garamond Premr Pro Smbd", "Gautami", "Geeza Pro", "Geneva", "Gentium Basic", "Gentium Book Basic", "Georgia", "Giddyup Std", "Gigi", "Gill Sans MT", "Gill Sans MT Condensed", "Gill Sans MT Ext Condensed Bold", "Gill Sans Ultra Bold", "Gill Sans Ultra Bold Condensed", "Gisha", "Gloucester MT Extra Condensed", "GothicE", "GothicG", "GothicI", "Goudy Old Style", "Goudy Stout", "GreekC", "GreekS", "Gujarati MT", "Gujarati Sangam MN", "Gulim", "GulimChe", "Gungsuh", "GungsuhChe", "Gurmukhi MT", "Guttman Yad", "HYSerif", "Haettenschweiler", "Harlow Solid Italic", "Harrington", "Heather Script One", "Heiti SC", "Heiti TC", "Helvetica", "Helvetica Neue", "High Tower Text", "Hiragino Kaku Gothic Pro", "Hiragino Kaku Gothic ProN", "Hiragino Mincho Pro", "Hiragino Mincho ProN", "Hobo Std", "Hoefler Text", "ISOCP", "ISOCP2", "ISOCP3", "ISOCPEUR", "ISOCT", "ISOCT2", "ISOCT3", "ISOCTEUR", "Impact", "Imprint MT Shadow", "InaiMathi", "Informal Roman", "IrisUPC", "Iskoola Pota", "Italic", "ItalicC", "ItalicT", "JasmineUPC", "Jokerman", "Jomolhari", "Juice ITC", "KaiTi", "KaiTi_GB2312", "Kailasa", "Kaiti SC", "Kaiti TC", "Kalinga", "Kannada MN", "Kannada Sangam MN", "Kartika", "Kedage", "Kefa", "Kh-SrokKhleang", "Khmer MN", "Khmer OS", "Khmer OS Fasthand", "Khmer OS Freehand", "Khmer OS Metal Chrieng", "Khmer OS Muol", "Khmer OS System", "Khmer Sangam MN", "Khmer UI", "KodchiangUPC", "Kokila", "Kozuka Gothic Pr6N B", "Kozuka Gothic Pr6N EL", "Kozuka Gothic Pr6N H", "Kozuka Gothic Pr6N L", "Kozuka Gothic Pr6N M", "Kozuka Gothic Pr6N R", "Kozuka Gothic Pro B", "Kozuka Gothic Pro EL", "Kozuka Gothic Pro H", "Kozuka Gothic Pro L", "Kozuka Gothic Pro M", "Kozuka Gothic Pro R", "Kozuka Mincho Pr6N B", "Kozuka Mincho Pr6N EL", "Kozuka Mincho Pr6N H", "Kozuka Mincho Pr6N L", "Kozuka Mincho Pr6N M", "Kozuka Mincho Pr6N R", "Kozuka Mincho Pro B", "Kozuka Mincho Pro EL", "Kozuka Mincho Pro H", "Kozuka Mincho Pro L", "Kozuka Mincho Pro M", "Kozuka Mincho Pro R", "Kristen ITC", "Ktav", "KufiStandardGK", "Kunstler Script", "LUCIDA GRANDE", "Lao UI", "Latha", "Latin Modern Math", "Leelawadee", "Letter Gothic Std", "Levenim MT", "LiHei Pro", "LiSong Pro", "Liberation Sans", "Liberation Serfi", "Liberation Mono", "Liberation Sans Narrow", "Libertinus Math", "Likhan", "LilyUPC", "Lithos Pro Regular", "Lucida Bright", "Lucida Calligraphy", "Lucida Console", "Lucida Fax", "Lucida Grande", "Lucida Handwriting", "Lucida Sans", "Lucida Sans Typewriter", "Lucida Sans Unicode", "MS Gothic", "MS Mincho", "MS Outlook", "MS PGothic", "MS PMincho", "MS Reference Sans Serif", "MS Reference Specialty", "MS Sans Serif", "MS Serif", "fakefont2", "MS Song", "MS UI Gothic", "MT Extra", "MV Boli", "MYRIAD", "MYRIAD PRO", "Magneto", "Maiandra GD", "Malayalam MN", "Malayalam Sangam MN", "Malgun Gothic", "Mangal", "Marlett", "Matura MT Script Capitals", "Meiryo", "Meiryo UI", "Mesquite Std", "Microsoft Himalaya", "Microsoft JhengHei", "Microsoft JhengHei UI", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Sans Serif", "Microsoft Tai Le", "Microsoft Uighur", "Microsoft YaHei", "Microsoft YaHei UI", "Microsoft Yi Baiti", "Ming(for ISO10646)", "MingLiU", "MingLiU-ExtB", "MingLiU_HKSCS", "MingLiU_HKSCS-ExtB", "MingLiu_HKSCS", "Minion Pro", "Minion Pro Cond", "Minion Pro Med", "Minion Pro SmBd", "Miriam", "Miriam Fixed", "Mistral", "Mitra Mono", "Modern", "Modern No. 20", "Monaco", "Mongolian Baiti", "Monospac821 BT", "Monotxt", "Monotype Corsiva", "MoolBoran", "MotoyaLCedar", "MotoyaLMaru", "Mshtakan", "Mukti Narrow", "Myriad Arabic", "Myriad Hebrew", "Myriad Pro", "Myriad Pro Cond", "Myriad Pro Light", "Myriad Web Pro", "NSimSun", "NanumGothic", "Narkisim", "Niagara Engraved", "Niagara Solid", "Nirmala UI", "Noto Mono", "Noto Color Emoji", "Noto Emoji", "Noto Kufi Arabic ", "Noto Naskh Arabic", "Noto Sans", "Noto Sans CJK JP", "Noto Sans CJK KR", "Noto Sans CJK SC", "Noto Sans CJK TC", "Noto Sans JP", "Noto Sans KR", "Noto Sans Mono CJK JP", "Noto Sans Lao ", "Noto Sans Mono CJK KR", "Noto Sans Mono CJK SC", "Noto Sans Mono CJK TC", "Noto Sans SC", "Noto Sans TC", "Noto Serif", "Noto Serif CJK JP", "Noto Serif CJK KR", "Noto Serif CJK SC", "Noto Serif CJK TC", "Noto Serif Ahom", "Nueva Std", "Nueva Std Cond", "Nyala", "OCR A Extended", "OCR A Std", "OCR-A BT", "OCR-B 10 BT", "Old English Text MT", "Onyx", "OpenSymbol", "Orator Std", "Orator Std Slanted", "Oriya MN", "Oriya Sangam MN", "Osaka-Mono", "OskiDakelh", "Ouverture script", "PMingLiU", "PMingLiU-ExtB", "PMingLiu", "Palace Script MT", "Palatino", "Palatino Linotype", "PanRoman", "Papyrus", "Parchment", "Perpetua", "Perpetua Titling MT", "PhnomPenh OT", "Pigiarniq", "PingFang SC", "PingFang TC", "Plantagenet Cherokee", "Playbill", "Poor Richard", "Poplar Std", "Pothana", "Power Clear", "Power Green", "Power Green Narrow", "Power Green Small", "Power Red and Blue", "Power Red and Blue Intl", "Power Red and Green", "Prestige Elite Std", "Prestige Elite Std Bd", "Pristina", "Proxy 1", "Proxy 2", "Proxy 3", "Proxy 4", "Proxy 5", "Proxy 6", "Proxy 7", "Proxy 8", "Proxy 9", "Raavi", "Rachana_w01", "Rage Italic", "Raghindi", "Ravie", "Roboto", "Roboto Slab", "Roboto Mono", "Rockwell", "Rockwell Condensed", "Rockwell Extra Bold", "Rod", "Roman", "RomanC", "RomanD", "RomanS", "RomanT", "Romantic", "Rosewood Std Regular", "STHeiti", "STIX Math", "STIX Two Math", "STIXGeneral", "STSong", "Saab", "Sakkal Majalla", "San Francisco", "SansSerif", "Script", "Script MT Bold", "ScriptC", "ScriptS", "Segoe Print", "Segoe Script", "Segoe UI", "Segoe UI Emoji", "Segoe UI Light", "Segoe UI Semibold", "Segoe UI Semilight", "Segoe UI Symbol", "Shonar Bangla", "Showcard Gothic", "Shruti", "SimHei", "SimSun", "SimSun-ExtB", "Simplex", "Simplified Arabic", "Simplified Arabic Fixed", "Sinhala MN", "Sinhala Sangam MN", "Skype UI Symbol", "Small Fonts", "SmartGothic", "Snap ITC", "Songti SC", "Songti TC", "Square721 BT", "Stencil", "Stencil Std", "Stylus BT", "Sun-ExtA", "SuperFrench", "Swis721 BT", "Swis721 BdCnOul BT", "Swis721 BdOul BT", "Swis721 Blk BT", "Swis721 BlkCn BT", "Swis721 BlkEx BT", "Swis721 BlkOul BT", "Swis721 Cn BT", "Swis721 Ex BT", "Swis721 Hv BT", "Swis721 Lt BT", "Swis721 LtCn BT", "Swis721 LtEx BT", "Syastro", "Sylfaen", "Symap", "Symath", "Symbol", "Symeteo", "Symusic", "System", "TITUS Cyberbit Basic", "Tahoma", "TeX Gyre Bonum Math", "TeX Gyre Pagella Math", "TeX Gyre Schola", "TeX Gyre Termes Math", "Technic", "TechnicBold", "TechnicLite", "Tekton Pro", "Tekton Pro Cond", "Tekton Pro Ext", "Telugu MN", "Telugu Sangam MN", "Tempus Sans ITC", "Terminal", "Thonburi", "ThoolikaUnicode", "Tibetan Machine Uni", "Times", "Times New Roman", "Times New Roman Baltic", "Times New Roman CE", "Times New Roman CYR", "Times New Roman Cyr", "Times New Roman Greek", "Times New Roman PS", "Times New Roman TUR", "Traditional Arabic", "Trajan Pro", "Trebuchet MS", "Tunga", "Tw Cen MT", "Tw Cen MT Condensed", "Tw Cen MT Condensed Extra Bold", "Twemoji Mozilla", "Txt", "Ubuntu", "Ubuntu Light", "Ubuntu Bold", "Ubuntu Mono", "UniversalMath1 BT", "Uqammaq", "Utsaah", "VL Gothic", "VL PGothic", "Vani", "Verdana", "Vijaya", "Viner Hand ITC", "Vineta BT", "Visual Geez Unicode", "Visual Geez Unicode Agazian", "Visual Geez Unicode Title", "Vivaldi", "Vladimir Script", "Vrinda", "WP Arabic Sihafa", "WP ArabicScript Sihafa", "WP CyrillicA", "WP CyrillicB", "WP Greek Century", "WP Greek Courier", "WP Greek Helve", "WP Hebrew David", "WP MultinationalA Courier", "WP MultinationalA Helve", "WP MultinationalA Roman", "WP MultinationalB Courier", "WP MultinationalB Helve", "WP MultinationalB Roman", "WST_Czec", "WST_Engl", "WST_Fren", "WST_Germ", "WST_Ital", "WST_Span", "WST_Swed", "Webdings", "Wide Latin", "Wingdings", "Wingdings 2", "Wingdings 3", "XITS Math", "Yu Gothic", "Yu Mincho", "ZWAdobeF", "Zuzumbo", "cursive", "fantasy", "monospace", "ori1Uni", "sans-serif", "serif"];
@@ -785,7 +792,7 @@ const fingerprint = (): Promise<any> => {
           const list = [] as string[];
           const baseFonts = ['monospace', 'sans-serif', 'serif'] as string[];
 
-          const body = document.getElementsByTagName("body")[0] as any;
+          const body = document.getElementsByTagName("body")[0] as Element;
 
           const span = document.createElement("span") as any;
           span.style.fontSize = "72px";
@@ -830,7 +837,7 @@ const fingerprint = (): Promise<any> => {
           });
         });
       },
-      plugins: (): Promise<any[]> => {
+      plugins: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isChrome()) resolve([-1, null]);
           const plugins = (navigator as any).plugins;
@@ -858,14 +865,14 @@ const fingerprint = (): Promise<any> => {
           resolve([0, output]);
         });
       },
-      pluginLengthIsZero: (): Promise<any[]> => {
+      pluginLengthIsZero: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const plugins = (navigator as any).plugins;
           if (plugins === undefined) resolve([-1, null]);
           resolve([0, plugins.length === 0]);
         });
       },
-      sharedArrayBuffer: (): Promise<any[]> => {
+      sharedArrayBuffer: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (typeof window.SharedArrayBuffer === "function") {
             const sab = new window.SharedArrayBuffer(1);
@@ -877,7 +884,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      webdriver: (): Promise<any[]> => {
+      webdriver: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const webd = navigator.webdriver;
           if (webd === undefined) {
@@ -887,7 +894,7 @@ const fingerprint = (): Promise<any> => {
           }
         });
       },
-      getAttributeNames: (): Promise<any[]> => {
+      getAttributeNames: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const de = document.documentElement;
           if (de === undefined) resolve([-1, null]);
@@ -895,7 +902,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, de.getAttributeNames().length > 0]);
         });
       },
-      errorToSource: (): Promise<any[]> => {
+      errorToSource: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           try {
             throw "lol";
@@ -910,7 +917,7 @@ const fingerprint = (): Promise<any> => {
           resolve([-1, null]);
         });
       },
-      errors: (): Promise<any[]> => {
+      errors: (): Promise<[number, any[]]> => {
         return new Promise((resolve): void => {
           const errorTests = [
             () => new Function('alert(")'),
@@ -934,10 +941,10 @@ const fingerprint = (): Promise<any> => {
           resolve([0, err]);
         });
       },
-      installTrigger: (): Promise<any[]> => {
+      installTrigger: (): Promise<[number, boolean]> => {
         return Promise.resolve([0, (window as any).InstallTrigger !== undefined]);
       },
-      rtt: (): Promise<any[]> => {
+      rtt: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const con = (navigator as any).connection;
           if (con === undefined) resolve([-1, null]);
@@ -946,7 +953,7 @@ const fingerprint = (): Promise<any> => {
           resolve([0, rtt === 0]);
         });
       },
-      math: (): Promise<any[]> => {
+      math: (): Promise<[number, number]> => {
         return new Promise((resolve): void => {
           const m = Math;
 
@@ -980,13 +987,13 @@ const fingerprint = (): Promise<any> => {
             m.exp(1) - 1,
             (m.log1p || returnZero)(10),
             m.log(11),
-            m.pow(m.PI, -100)
+            m.pow(m.PI, -100),
           ];
       
           resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
         });
       },
-      notifications: (): Promise<any[]> => {
+      notifications: (): Promise<[number, any]> => {
           return new Promise((resolve): void => {
             if (window.Notification === undefined) {
               resolve([-1, null]);
@@ -997,10 +1004,10 @@ const fingerprint = (): Promise<any> => {
             if (typeof navigator.permissions.query !== "function") {
               resolve([-3, null]);
             }
-            navigator.permissions.query({name: "notifications"}).then((res) => {
+            navigator.permissions.query({name: "notifications"}).then((res): void => {
               // console.log(res);
               resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
-            }).catch((res) => {
+            }).catch((res): void => {
               // console.log(res);
               resolve([-4, null]);
             });
@@ -1009,7 +1016,7 @@ const fingerprint = (): Promise<any> => {
     } as any;
 
     const index = [] as string[];
-    const promises = [] as any[];
+    const promises = [] as Promise<[number, any]>[];
     for (const method in fingerprints) {
       index.push(method);
       // console.log(method);
@@ -1018,7 +1025,7 @@ const fingerprint = (): Promise<any> => {
       promises.push(exe);
     }
 
-    Promise.all(promises).then((k) => {
+    Promise.all(promises).then((k): void => {
       const profile = {} as any;
       for (let i = 0; i < index.length; i++) {
         profile[index[i]] = k[i];
