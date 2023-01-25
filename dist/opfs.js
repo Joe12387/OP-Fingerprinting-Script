@@ -683,9 +683,9 @@ var fingerprint = function () {
                     }
                     output.attributes = murmurhash3_32_gc(JSON.stringify(output.attributes), 420);
                     output.parameters = murmurhash3_32_gc(JSON.stringify(output.parameters), 420);
-                    output.shaderPrecision = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
-                    output.extensions = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
-                    output.constants = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.constants), 420);
+                    // output.shaderPrecision = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
+                    // output.extensions = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
+                    // output.constants = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.constants), 420);
                     resolve([0, output]);
                 });
             },
