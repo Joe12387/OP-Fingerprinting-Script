@@ -58,18 +58,16 @@ var fingerprint = function () {
     function isFirefox() {
         return document.documentElement !== undefined && document.documentElement.style.MozAppearance !== undefined;
     }
-    function isFirefoxResistFingerprinting() {
-        if (!isFirefox())
-            return false;
-        var intl = window.Intl;
-        var date = intl.DateTimeFormat;
-        if (typeof date === "function") {
-            var tz = (new date).resolvedOptions().timeZone;
-            if (tz === "UTC")
-                return true;
-        }
-        return false;
-    }
+    // function isFirefoxResistFingerprinting(): boolean {
+    //   if (!isFirefox()) return false;
+    //   const intl = window.Intl;
+    //   const date = intl.DateTimeFormat;
+    //   if (typeof date === "function") {
+    //     const tz = (new date).resolvedOptions().timeZone;
+    //     if (tz === "UTC") return true;
+    //   }
+    //   return false;
+    // }
     function isMSIE() {
         return navigator.msSaveBlob !== undefined;
     }
@@ -155,7 +153,7 @@ var fingerprint = function () {
             },
             hardwareConcurrency: function () {
                 return new Promise(function (resolve) {
-                    if (isBrave() || isFirefoxResistFingerprinting()) {
+                    if (isBrave() /*|| isFirefoxResistFingerprinting()*/) {
                         return resolve([-2, null]);
                     }
                     var hc = navigator.hardwareConcurrency;
@@ -194,8 +192,7 @@ var fingerprint = function () {
             },
             doNotTrack: function () {
                 return new Promise(function (resolve) {
-                    if (isFirefoxResistFingerprinting())
-                        resolve([-2, null]);
+                    // if (isFirefoxResistFingerprinting()) resolve([-2, null]);
                     var dnt = navigator.doNotTrack;
                     if (dnt === undefined) {
                         resolve([-1, null]);
@@ -265,8 +262,8 @@ var fingerprint = function () {
                         for (var i = 0; i <= 100; ++i) {
                             if (matchMedia("(max-monochrome: " + i + ")").matches)
                                 resolve([0, i]);
-                            // throw new Error("Max monochrome value is over 100");
                         }
+                        resolve([-2, null]);
                     }
                     resolve([-1, null]);
                 });
@@ -332,11 +329,10 @@ var fingerprint = function () {
             },
             screenResolution: function () {
                 return new Promise(function (resolve) {
-                    if (isFirefoxResistFingerprinting())
-                        resolve([-1, null]);
+                    // if (isFirefoxResistFingerprinting()) resolve([-1, null]);
                     if (isChrome() && !isBrave())
                         resolve([-2, null]);
-                    resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
+                    resolve([0, [screen.width, screen.height].join("x")]);
                 });
             },
             jsHeapSizeLimit: function () {
@@ -414,7 +410,7 @@ var fingerprint = function () {
             },
             canvasAPI: function () {
                 return new Promise(function (resolve) {
-                    if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() || isFirefoxResistFingerprinting())
+                    if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() /*|| isFirefoxResistFingerprinting()*/)
                         resolve([-1, null]);
                     var asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
                     function canvas_geometry(ctx) {
@@ -512,7 +508,7 @@ var fingerprint = function () {
             },
             performance: function () {
                 return new Promise(function (resolve) {
-                    if (!isChrome())
+                    if (!isChrome() || isBrave())
                         resolve([-1, null]);
                     var perf = window.performance;
                     if (perf === undefined)
@@ -683,15 +679,15 @@ var fingerprint = function () {
                     }
                     output.attributes = murmurhash3_32_gc(JSON.stringify(output.attributes), 420);
                     output.parameters = murmurhash3_32_gc(JSON.stringify(output.parameters), 420);
-                    // output.shaderPrecision = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
-                    // output.extensions = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
-                    // output.constants = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.constants), 420);
+                    output.shaderPrecision = murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
+                    output.extensions = murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
+                    output.constants = murmurhash3_32_gc(JSON.stringify(output.constants), 420);
                     resolve([0, output]);
                 });
             },
             webglProgram: function () {
                 return new Promise(function (resolve) {
-                    if (isBrave() || isFirefoxResistFingerprinting())
+                    if (isBrave() /*|| isFirefoxResistFingerprinting()*/)
                         resolve([-3, null]);
                     var canvas = document.createElement('canvas');
                     try {
