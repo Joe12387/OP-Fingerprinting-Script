@@ -78,17 +78,17 @@ const fingerprint = (): Promise<{
     return document.documentElement !== undefined && (document.documentElement as any).style.MozAppearance !== undefined;
   }
 
-  function isFirefoxResistFingerprinting(): boolean {
-    if (!isFirefox()) return false;
+  // function isFirefoxResistFingerprinting(): boolean {
+  //   if (!isFirefox()) return false;
 
-    const intl = window.Intl;
-    const date = intl.DateTimeFormat;
-    if (typeof date === "function") {
-      const tz = (new date).resolvedOptions().timeZone;
-      if (tz === "UTC") return true;
-    }
-    return false;
-  }
+  //   const intl = window.Intl;
+  //   const date = intl.DateTimeFormat;
+  //   if (typeof date === "function") {
+  //     const tz = (new date).resolvedOptions().timeZone;
+  //     if (tz === "UTC") return true;
+  //   }
+  //   return false;
+  // }
 
   function isMSIE(): boolean {
     return (navigator as any).msSaveBlob !== undefined;
@@ -170,7 +170,7 @@ const fingerprint = (): Promise<{
       },
       hardwareConcurrency: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isBrave() || isFirefoxResistFingerprinting()) {
+          if (isBrave() /*|| isFirefoxResistFingerprinting()*/) {
             return resolve([-2, null]);
           }
           const hc = navigator.hardwareConcurrency;
@@ -206,7 +206,7 @@ const fingerprint = (): Promise<{
       },
       doNotTrack: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isFirefoxResistFingerprinting()) resolve([-2, null]);
+          // if (isFirefoxResistFingerprinting()) resolve([-2, null]);
           const dnt = navigator.doNotTrack;
           if (dnt === undefined) {
             resolve([-1, null]);
@@ -275,8 +275,8 @@ const fingerprint = (): Promise<{
           if (matchMedia("(min-monochrome: 0)").matches) {
             for (let i = 0; i <= 100; ++i) {
               if (matchMedia("(max-monochrome: " + i + ")").matches) resolve([0, i]);
-              // throw new Error("Max monochrome value is over 100");
             }
+            resolve([-2, null]);
           }
           resolve([-1, null]);
         });
@@ -345,9 +345,9 @@ const fingerprint = (): Promise<{
       },
       screenResolution: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isFirefoxResistFingerprinting()) resolve([-1, null]);
+          // if (isFirefoxResistFingerprinting()) resolve([-1, null]);
           if (isChrome() && !isBrave()) resolve([-2, null]);
-          resolve([0, [Number(screen.width), Number(screen.height)].sort().reverse().join("x")]);
+          resolve([0, [screen.width, screen.height].join("x")]);
         });
       },
       jsHeapSizeLimit: (): Promise<[number, any]> => {
@@ -426,7 +426,7 @@ const fingerprint = (): Promise<{
       },
       canvasAPI: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() || isFirefoxResistFingerprinting()) resolve([-1, null]);
+          if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() /*|| isFirefoxResistFingerprinting()*/) resolve([-1, null]);
 
           const asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
 
@@ -544,7 +544,7 @@ const fingerprint = (): Promise<{
       },
       performance: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (!isChrome()) resolve([-1, null]);
+          if (!isChrome() || isBrave()) resolve([-1, null]);
 
           const perf = window.performance;
 
@@ -732,16 +732,16 @@ const fingerprint = (): Promise<{
 
           output.attributes = murmurhash3_32_gc(JSON.stringify(output.attributes), 420);
           output.parameters = murmurhash3_32_gc(JSON.stringify(output.parameters), 420);
-          // output.shaderPrecision = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
-          // output.extensions = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
-          // output.constants = isBrave() ? 0 : murmurhash3_32_gc(JSON.stringify(output.constants), 420);
+          output.shaderPrecision = murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
+          output.extensions = murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
+          output.constants = murmurhash3_32_gc(JSON.stringify(output.constants), 420);
 
           resolve([0, output]);
         });
       },
       webglProgram: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isBrave() || isFirefoxResistFingerprinting()) resolve([-3, null]);
+          if (isBrave() /*|| isFirefoxResistFingerprinting()*/) resolve([-3, null]);
 
           const canvas = document.createElement('canvas');
 
