@@ -1,4 +1,13 @@
 "use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 /**
  *
  * Overpowered Browser Fingerprinting Script v1.0.2 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
@@ -412,6 +421,69 @@ var fingerprint = function () {
                 return new Promise(function (resolve) {
                     if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() /*|| isFirefoxResistFingerprinting()*/)
                         resolve([-1, null]);
+                    var canvasIsTrustable = function () {
+                        var pattern1 = [];
+                        var pattern2 = [];
+                        var len = 8;
+                        var alpha = 255;
+                        var visualMultiplier = 5;
+                        var pixelsPerturbed = false;
+                        try {
+                            var options = {
+                                willReadFrequently: true,
+                                desynchronized: true,
+                            };
+                            var canvasDisplay1 = document.createElement('canvas');
+                            var canvasDisplay2 = document.createElement('canvas');
+                            var canvas1 = document.createElement('canvas');
+                            var canvas2 = document.createElement('canvas');
+                            var contextDisplay1_1 = canvasDisplay1.getContext('2d', options);
+                            var contextDisplay2 = canvasDisplay2.getContext('2d', options);
+                            var context1_1 = canvas1.getContext('2d', options);
+                            var context2_1 = canvas2.getContext('2d', options);
+                            if (!contextDisplay1_1 || !contextDisplay2 || !context1_1 || !context2_1) {
+                                return true;
+                            }
+                            canvasDisplay1.width = len * visualMultiplier;
+                            canvasDisplay1.height = len * visualMultiplier;
+                            canvasDisplay2.width = len * visualMultiplier;
+                            canvasDisplay2.height = len * visualMultiplier;
+                            canvas1.width = len;
+                            canvas1.height = len;
+                            canvas2.width = len;
+                            canvas2.height = len;
+                            ;
+                            __spreadArray([], Array(len), true).forEach(function (e, x) { return __spreadArray([], Array(len), true).forEach(function (e, y) {
+                                var red = ~~(Math.random() * 256);
+                                var green = ~~(Math.random() * 256);
+                                var blue = ~~(Math.random() * 256);
+                                var colors = "".concat(red, ", ").concat(green, ", ").concat(blue, ", ").concat(alpha);
+                                context1_1.fillStyle = "rgba(".concat(colors, ")");
+                                context1_1.fillRect(x, y, 1, 1);
+                                contextDisplay1_1.fillStyle = "rgba(".concat(colors, ")");
+                                contextDisplay1_1.fillRect(x * visualMultiplier, y * visualMultiplier, 1 * visualMultiplier, 1 * visualMultiplier);
+                                return pattern1.push(colors);
+                            }); });
+                            ;
+                            __spreadArray([], Array(len), true).forEach(function (e, x) { return __spreadArray([], Array(len), true).forEach(function (e, y) {
+                                var _a = (context1_1.getImageData(x, y, 1, 1) || {}).data, red = _a[0], green = _a[1], blue = _a[2], alpha = _a[3];
+                                var colors = "".concat(red, ", ").concat(green, ", ").concat(blue, ", ").concat(alpha);
+                                context2_1.fillStyle = "rgba(".concat(colors, ")");
+                                context2_1.fillRect(x, y, 1, 1);
+                                var _b = (context2_1.getImageData(x, y, 1, 1) || {}).data, red2 = _b[0], green2 = _b[1], blue2 = _b[2], alpha2 = _b[3];
+                                return pattern2.push(colors);
+                            }); });
+                            ;
+                            __spreadArray([], Array(pattern1.length), true).forEach(function (e, i) {
+                                if (pattern1[i] != pattern2[i])
+                                    pixelsPerturbed = true;
+                            });
+                        }
+                        catch (e) { }
+                        return pixelsPerturbed;
+                    };
+                    if (!canvasIsTrustable())
+                        resolve([-2, null]);
                     var asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
                     function canvas_geometry(ctx) {
                         ctx.globalCompositeOperation = "multiply";
