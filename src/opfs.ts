@@ -428,6 +428,85 @@ const fingerprint = (): Promise<{
         return new Promise((resolve): void => {
           if ((isSafari() && navigator.maxTouchPoints !== undefined) || isBrave() /*|| isFirefoxResistFingerprinting()*/) resolve([-1, null]);
 
+          const canvasIsTrustable = (): boolean => { // adapted from creepjs by abrahamjuliot: https://github.com/abrahamjuliot/creepjs/blob/master/src/canvas/index.ts
+            const pattern1 = [] as string[];
+            const pattern2 = [] as string[];
+            const len = 8;
+            const alpha = 255;
+            const visualMultiplier = 5;
+
+            let pixelsPerturbed = false;
+
+            try {
+              const options = {
+                willReadFrequently: true,
+                desynchronized: true,
+              }
+              const canvasDisplay1 = document.createElement('canvas');
+              const canvasDisplay2 = document.createElement('canvas');
+              const canvas1 = document.createElement('canvas');
+              const canvas2 = document.createElement('canvas');
+              const contextDisplay1 = canvasDisplay1.getContext('2d', options) as any;
+              const contextDisplay2 = canvasDisplay2.getContext('2d', options) as any;
+              const context1 = canvas1.getContext('2d', options) as any;
+              const context2 = canvas2.getContext('2d', options) as any;
+          
+              if (!contextDisplay1 || !contextDisplay2 || !context1 || !context2) {
+                return true;
+              }
+          
+              canvasDisplay1.width = len * visualMultiplier;
+              canvasDisplay1.height = len * visualMultiplier;
+              canvasDisplay2.width = len * visualMultiplier;
+              canvasDisplay2.height = len * visualMultiplier;
+              canvas1.width = len;
+              canvas1.height = len;
+              canvas2.width = len;
+              canvas2.height = len;
+          
+              ;[...Array(len)].forEach((e, x) => [...Array(len)].forEach((e, y) => {
+                const red = ~~(Math.random() * 256);
+                const green = ~~(Math.random() * 256);
+                const blue = ~~(Math.random() * 256);
+                const colors = `${red}, ${green}, ${blue}, ${alpha}`;
+                context1.fillStyle = `rgba(${colors})`;
+                context1.fillRect(x, y, 1, 1);
+                contextDisplay1.fillStyle = `rgba(${colors})`;
+                contextDisplay1.fillRect(
+                  x * visualMultiplier,
+                  y * visualMultiplier,
+                  1 * visualMultiplier,
+                  1 * visualMultiplier,
+                );
+                return pattern1.push(colors);
+              }));
+          
+              ;[...Array(len)].forEach((e, x) => [...Array(len)].forEach((e, y) => {
+                const {
+                  data: [red, green, blue, alpha],
+                } = context1.getImageData(x, y, 1, 1) || {};
+          
+                const colors = `${red}, ${green}, ${blue}, ${alpha}`;
+                context2.fillStyle = `rgba(${colors})`;
+                context2.fillRect(x, y, 1, 1);
+          
+                const {
+                  data: [red2, green2, blue2, alpha2],
+                } = context2.getImageData(x, y, 1, 1) || {};
+
+                return pattern2.push(colors);
+              }));
+                    
+              ;[...Array(pattern1.length)].forEach((e, i) => {
+                if (pattern1[i] != pattern2[i]) pixelsPerturbed = true;
+              });
+            } catch (e) {}
+          
+            return pixelsPerturbed;
+          }    
+          
+          if (!canvasIsTrustable()) resolve([-2, null]);
+
           const asciiString = unescape("%uD83D%uDE00abcdefghijklmnopqrstuvwxyz%uD83D%uDD2B%uD83C%uDFF3%uFE0F%u200D%uD83C%uDF08%uD83C%uDDF9%uD83C%uDDFC%uD83C%uDFF3%uFE0F%u200D%u26A7%uFE0F0123456789");
 
           function canvas_geometry(ctx: any): boolean {
