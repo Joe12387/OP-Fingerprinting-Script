@@ -435,7 +435,7 @@ const fingerprint = (): Promise<{
             const alpha = 255;
             const visualMultiplier = 5;
 
-            let pixelsPerturbed = false;
+            let pixelsPerturbed = true;
 
             try {
               const options = {
@@ -498,7 +498,7 @@ const fingerprint = (): Promise<{
               }));
                     
               ;[...Array(pattern1.length)].forEach((e, i) => {
-                if (pattern1[i] != pattern2[i]) pixelsPerturbed = true;
+                if (pattern1[i] != pattern2[i]) pixelsPerturbed = false;
               });
             } catch (e) {}
           
