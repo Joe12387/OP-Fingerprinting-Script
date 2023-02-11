@@ -427,7 +427,7 @@ var fingerprint = function () {
                         var len = 8;
                         var alpha = 255;
                         var visualMultiplier = 5;
-                        var pixelsPerturbed = false;
+                        var pixelsPerturbed = true;
                         try {
                             var options = {
                                 willReadFrequently: true,
@@ -476,7 +476,7 @@ var fingerprint = function () {
                             ;
                             __spreadArray([], Array(pattern1.length), true).forEach(function (e, i) {
                                 if (pattern1[i] != pattern2[i])
-                                    pixelsPerturbed = true;
+                                    pixelsPerturbed = false;
                             });
                         }
                         catch (e) { }
