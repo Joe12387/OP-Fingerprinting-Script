@@ -435,7 +435,7 @@ const fingerprint = (): Promise<{
             const alpha = 255;
             const visualMultiplier = 5;
 
-            let pixelsPerturbed = true;
+            let canvasTrusted = true;
 
             try {
               const options = {
@@ -498,11 +498,11 @@ const fingerprint = (): Promise<{
               }));
                     
               ;[...Array(pattern1.length)].forEach((e, i) => {
-                if (pattern1[i] != pattern2[i]) pixelsPerturbed = false;
+                if (pattern1[i] != pattern2[i]) canvasTrusted = false;
               });
             } catch (e) {}
           
-            return pixelsPerturbed;
+            return canvasTrusted;
           }    
           
           if (!canvasIsTrustable()) resolve([-2, null]);
@@ -809,11 +809,11 @@ const fingerprint = (): Promise<{
             }
           }
 
-          output.attributes = murmurhash3_32_gc(JSON.stringify(output.attributes), 420);
-          output.parameters = murmurhash3_32_gc(JSON.stringify(output.parameters), 420);
-          output.shaderPrecision = murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
-          output.extensions = murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
-          output.constants = murmurhash3_32_gc(JSON.stringify(output.constants), 420);
+          // output.attributes = murmurhash3_32_gc(JSON.stringify(output.attributes), 420);
+          // output.parameters = murmurhash3_32_gc(JSON.stringify(output.parameters), 420);
+          // output.shaderPrecision = murmurhash3_32_gc(JSON.stringify(output.shaderPrecision), 420);
+          // output.extensions = murmurhash3_32_gc(JSON.stringify(output.extensions), 420);
+          // output.constants = murmurhash3_32_gc(JSON.stringify(output.constants), 420);
 
           resolve([0, output]);
         });
