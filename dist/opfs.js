@@ -966,7 +966,9 @@ var fingerprint = function () {
                             });
                         });
                     }
-                    resolve([-1, null]);
+                    else {
+                        resolve([-1, null]);
+                    }
                 });
             },
         };

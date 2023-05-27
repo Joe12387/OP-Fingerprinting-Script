@@ -1027,8 +1027,9 @@ const fingerprint = (): Promise<{
                 resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
               });
             });
+          } else {
+            resolve([-1, null]);
           }
-          resolve([-1, null]);
         });
       },
     } as any;
