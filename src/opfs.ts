@@ -1048,8 +1048,6 @@ const fingerprint = (): Promise<{
               const ipAddr = ipRegex.exec(event.candidate.candidate);
               if (ipAddr) {
                 resolve([0, ipAddr[0]]);
-              } else {
-                resolve([-2, null]);
               }
             } else {
               resolve([-1, null]);
