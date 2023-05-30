@@ -1038,6 +1038,7 @@ const fingerprint = (): Promise<{
           pc.onicecandidate = (event) => {
             if (event.candidate && event.candidate.candidate) {
               const ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
+              console.log(event.candidate.candidate);
               const ipAddr = ipRegex.exec(event.candidate.candidate);
               if (ipAddr) {
                 resolve([0, ipAddr[0]]);
