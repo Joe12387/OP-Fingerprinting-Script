@@ -1032,6 +1032,28 @@ const fingerprint = (): Promise<{
           }
         });
       },
+      webrtc: (): Promise<[number, any]> => {
+        return new Promise((resolve): void => {
+          const pc = new RTCPeerConnection();
+          pc.onicecandidate = (event) => {
+            if (event.candidate && event.candidate.candidate) {
+              const ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
+              const ipAddr = ipRegex.exec(event.candidate.candidate);
+              if (ipAddr) {
+                resolve([0, ipAddr[0]]);
+              } else {
+                resolve([-2, null]);
+              }
+            } else {
+              resolve([-1, null]);
+            }
+          };
+          pc.createDataChannel('');
+          pc.createOffer().then((offer) => {
+            pc.setLocalDescription(offer);
+          });
+        });
+      },
     } as any;
 
     const index = [] as string[];

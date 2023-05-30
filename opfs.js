@@ -971,6 +971,30 @@ var fingerprint = function () {
                     }
                 });
             },
+            webrtc: function () {
+                return new Promise(function (resolve) {
+                    var pc = new RTCPeerConnection();
+                    pc.onicecandidate = function (event) {
+                        if (event.candidate && event.candidate.candidate) {
+                            var ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
+                            var ipAddr = ipRegex.exec(event.candidate.candidate);
+                            if (ipAddr) {
+                                resolve([0, ipAddr[0]]);
+                            }
+                            else {
+                                resolve([-2, null]);
+                            }
+                        }
+                        else {
+                            resolve([-1, null]);
+                        }
+                    };
+                    pc.createDataChannel('');
+                    pc.createOffer().then(function (offer) {
+                        pc.setLocalDescription(offer);
+                    });
+                });
+            },
         };
         var index = [];
         var promises = [];
