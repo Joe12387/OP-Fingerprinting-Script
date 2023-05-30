@@ -1034,7 +1034,13 @@ const fingerprint = (): Promise<{
       },
       webrtc: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          const pc = new RTCPeerConnection();
+          const pc = new RTCPeerConnection({
+            iceServers: [
+              {
+                urls: 'stun:stun.l.google.com:19302'
+              }
+            ]
+          });
           pc.onicecandidate = (event) => {
             if (event.candidate && event.candidate.candidate) {
               const ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;

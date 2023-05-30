@@ -973,7 +973,13 @@ var fingerprint = function () {
             },
             webrtc: function () {
                 return new Promise(function (resolve) {
-                    var pc = new RTCPeerConnection();
+                    var pc = new RTCPeerConnection({
+                        iceServers: [
+                            {
+                                urls: 'stun:stun.l.google.com:19302'
+                            }
+                        ]
+                    });
                     pc.onicecandidate = function (event) {
                         if (event.candidate && event.candidate.candidate) {
                             var ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
