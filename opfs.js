@@ -58,16 +58,6 @@ var fingerprint = function () {
     function isFirefox() {
         return document.documentElement !== undefined && document.documentElement.style.MozAppearance !== undefined;
     }
-    // function isFirefoxResistFingerprinting(): boolean {
-    //   if (!isFirefox()) return false;
-    //   const intl = window.Intl;
-    //   const date = intl.DateTimeFormat;
-    //   if (typeof date === "function") {
-    //     const tz = (new date).resolvedOptions().timeZone;
-    //     if (tz === "UTC") return true;
-    //   }
-    //   return false;
-    // }
     function isMSIE() {
         return navigator.msSaveBlob !== undefined;
     }
@@ -117,6 +107,17 @@ var fingerprint = function () {
                     }
                     else {
                         resolve([0, cd]);
+                    }
+                });
+            },
+            pixelDepth: function () {
+                return new Promise(function (resolve) {
+                    var pd = window.screen.pixelDepth;
+                    if (pd === undefined) {
+                        resolve([-1, null]);
+                    }
+                    else {
+                        resolve([0, pd]);
                     }
                 });
             },
@@ -192,7 +193,6 @@ var fingerprint = function () {
             },
             doNotTrack: function () {
                 return new Promise(function (resolve) {
-                    // if (isFirefoxResistFingerprinting()) resolve([-2, null]);
                     var dnt = navigator.doNotTrack;
                     if (dnt === undefined) {
                         resolve([-1, null]);
@@ -329,7 +329,6 @@ var fingerprint = function () {
             },
             screenResolution: function () {
                 return new Promise(function (resolve) {
-                    // if (isFirefoxResistFingerprinting()) resolve([-1, null]);
                     if (isChrome() && !isBrave())
                         resolve([-2, null]);
                     resolve([0, [screen.width, screen.height].join("x")]);
@@ -357,7 +356,6 @@ var fingerprint = function () {
                     if (typeof context !== "function")
                         resolve([-2, null]);
                     context = new (context)(1, 44100, 44100);
-                    // console.log(context);
                     var pxi_oscillator = context.createOscillator();
                     pxi_oscillator.type = "triangle";
                     pxi_oscillator.frequency.value = 1e4;
@@ -564,7 +562,6 @@ var fingerprint = function () {
             },
             applePay: function () {
                 return new Promise(function (resolve) {
-                    // let ap = (window as any).ApplePaySession;
                     if (typeof window.ApplePaySession !== "function")
                         resolve([-1, null]);
                     var enabled = window.ApplePaySession.canMakePayments();
@@ -687,11 +684,12 @@ var fingerprint = function () {
             },
             webglProgram: function () {
                 return new Promise(function (resolve) {
-                    if (isBrave() /*|| isFirefoxResistFingerprinting()*/)
+                    if (isBrave())
                         resolve([-3, null]);
                     var canvas = document.createElement('canvas');
+                    var context;
                     try {
-                        var context = canvas.getContext("webgl") || canvas.getContext("experimental-webgl") || resolve([-1, null]);
+                        context = canvas.getContext("webgl") || canvas.getContext("experimental-webgl") || resolve([-1, null]);
                     }
                     catch (e) {
                         resolve([-2, null]);
@@ -884,17 +882,6 @@ var fingerprint = function () {
             installTrigger: function () {
                 return Promise.resolve([0, window.InstallTrigger !== undefined]);
             },
-            rtt: function () {
-                return new Promise(function (resolve) {
-                    var con = navigator.connection;
-                    if (con === undefined)
-                        resolve([-1, null]);
-                    var rtt = navigator.connection.rtt;
-                    if (rtt === undefined)
-                        resolve([-2, null]);
-                    resolve([0, rtt === 0]);
-                });
-            },
             math: function () {
                 return new Promise(function (resolve) {
                     var m = Math;
@@ -943,10 +930,8 @@ var fingerprint = function () {
                         resolve([-3, null]);
                     }
                     navigator.permissions.query({ name: "notifications" }).then(function (res) {
-                        // console.log(res);
                         resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
                     }).catch(function (res) {
-                        // console.log(res);
                         resolve([-4, null]);
                     });
                 });
@@ -994,7 +979,7 @@ var fingerprint = function () {
                             resolve([-1, null]);
                         }
                         else {
-                            resolve([0, ips]);
+                            resolve([0, ips.sort()]);
                         }
                     };
                     pc.createDataChannel('');
@@ -1016,9 +1001,7 @@ var fingerprint = function () {
         var promises = [];
         for (var method in fingerprints) {
             index.push(method);
-            // console.log(method);
             var exe = fingerprints[method]();
-            // console.log(exe);
             promises.push(exe);
         }
         Promise.all(promises).then(function (k) {
@@ -1045,10 +1028,8 @@ var fingerprint = function () {
                 },
                 profile: profile,
             };
-            // console.log(output);
             resolve(output);
         }).catch(function (err) {
-            // console.log(err);
             reject(err);
         });
     });
