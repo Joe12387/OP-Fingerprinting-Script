@@ -140,6 +140,16 @@ const fingerprint = (): Promise<{
           }
         });        
       },
+      pixelDepth: (): Promise<[number, any]> => {
+        return new Promise((resolve): void => {
+          const pd = window.screen.pixelDepth;
+          if (pd === undefined) {
+            resolve([-1, null]);
+          } else {
+            resolve([0, pd]);
+          }
+        });        
+      },
       devicePixelRatio: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if (isChrome() && !isBrave()) resolve([-2, null]);
@@ -1054,7 +1064,7 @@ const fingerprint = (): Promise<{
             } else if (ips.length == 0) {
               resolve([-1, null]);
             } else {
-              resolve([0, ips]);
+              resolve([0, ips.sort()]);
             }
           };
           pc.createDataChannel('');
