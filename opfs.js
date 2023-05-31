@@ -980,17 +980,21 @@ var fingerprint = function () {
                             }
                         ]
                     });
+                    var ips = [];
                     pc.onicecandidate = function (event) {
                         if (event.candidate && event.candidate.candidate) {
                             var ipRegex = /([0-9]{1,3}\.){3}[0-9]{1,3}/;
                             console.log(event.candidate.candidate);
                             var ipAddr = ipRegex.exec(event.candidate.candidate);
                             if (ipAddr) {
-                                resolve([0, ipAddr[0]]);
+                                ips.push(ipAddr[0]);
                             }
                         }
-                        else {
+                        else if (ips.length == 0) {
                             resolve([-1, null]);
+                        }
+                        else {
+                            resolve([0, ips]);
                         }
                     };
                     pc.createDataChannel('');
