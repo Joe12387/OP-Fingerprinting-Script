@@ -78,18 +78,6 @@ const fingerprint = (): Promise<{
     return document.documentElement !== undefined && (document.documentElement as any).style.MozAppearance !== undefined;
   }
 
-  // function isFirefoxResistFingerprinting(): boolean {
-  //   if (!isFirefox()) return false;
-
-  //   const intl = window.Intl;
-  //   const date = intl.DateTimeFormat;
-  //   if (typeof date === "function") {
-  //     const tz = (new date).resolvedOptions().timeZone;
-  //     if (tz === "UTC") return true;
-  //   }
-  //   return false;
-  // }
-
   function isMSIE(): boolean {
     return (navigator as any).msSaveBlob !== undefined;
   }
@@ -216,7 +204,6 @@ const fingerprint = (): Promise<{
       },
       doNotTrack: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          // if (isFirefoxResistFingerprinting()) resolve([-2, null]);
           const dnt = navigator.doNotTrack;
           if (dnt === undefined) {
             resolve([-1, null]);
@@ -355,7 +342,6 @@ const fingerprint = (): Promise<{
       },
       screenResolution: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          // if (isFirefoxResistFingerprinting()) resolve([-1, null]);
           if (isChrome() && !isBrave()) resolve([-2, null]);
           resolve([0, [screen.width, screen.height].join("x")]);
         });
@@ -380,8 +366,6 @@ const fingerprint = (): Promise<{
           if (typeof context !== "function") resolve([-2, null]);
 
           context = new(context)(1, 44100, 44100) as any;
-
-          // console.log(context);
 
           const pxi_oscillator = (context as any).createOscillator();
           pxi_oscillator.type = "triangle";
@@ -614,7 +598,6 @@ const fingerprint = (): Promise<{
       },
       applePay: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          // let ap = (window as any).ApplePaySession;
           if (typeof (window as any).ApplePaySession !== "function") resolve([-1, null]);
           const enabled = (window as any).ApplePaySession.canMakePayments();
           resolve([0, enabled]);
@@ -751,12 +734,13 @@ const fingerprint = (): Promise<{
       },
       webglProgram: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isBrave() /*|| isFirefoxResistFingerprinting()*/) resolve([-3, null]);
+          if (isBrave()) resolve([-3, null]);
 
           const canvas = document.createElement('canvas');
 
+          let context: any;
           try {
-            var context = canvas.getContext("webgl") as any || canvas.getContext("experimental-webgl") as any || resolve([-1, null]);
+            context = canvas.getContext("webgl") as any || canvas.getContext("experimental-webgl") as any || resolve([-1, null]);
           } catch (e: any) {
             resolve([-2, null]);
           }
@@ -954,15 +938,6 @@ const fingerprint = (): Promise<{
       installTrigger: (): Promise<[number, boolean]> => {
         return Promise.resolve([0, (window as any).InstallTrigger !== undefined]);
       },
-      rtt: (): Promise<[number, any]> => {
-        return new Promise((resolve): void => {
-          const con = (navigator as any).connection;
-          if (con === undefined) resolve([-1, null]);
-          const rtt = (navigator as any).connection.rtt;
-          if (rtt === undefined) resolve([-2, null]);
-          resolve([0, rtt === 0]);
-        });
-      },
       math: (): Promise<[number, number]> => {
         return new Promise((resolve): void => {
           const m = Math;
@@ -1015,10 +990,8 @@ const fingerprint = (): Promise<{
               resolve([-3, null]);
             }
             navigator.permissions.query({name: "notifications"}).then((res): void => {
-              // console.log(res);
               resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
             }).catch((res): void => {
-              // console.log(res);
               resolve([-4, null]);
             });
           });
@@ -1086,9 +1059,7 @@ const fingerprint = (): Promise<{
     const promises = [] as Promise<[number, any]>[];
     for (const method in fingerprints) {
       index.push(method);
-      // console.log(method);
       const exe = fingerprints[method]();
-      // console.log(exe);
       promises.push(exe);
     }
 
@@ -1116,10 +1087,8 @@ const fingerprint = (): Promise<{
         },
         profile: profile,
       };
-      // console.log(output);
       resolve(output);
     }).catch((err) => {
-      // console.log(err);
       reject(err);
     });
   });
