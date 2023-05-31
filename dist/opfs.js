@@ -1001,6 +1001,14 @@ var fingerprint = function () {
                     pc.createOffer().then(function (offer) {
                         pc.setLocalDescription(offer);
                     });
+                    setTimeout(function () {
+                        if (ips.length == 0) {
+                            resolve([-1, []]);
+                        }
+                        else {
+                            resolve([0, ips]);
+                        }
+                    }, 1000);
                 });
             },
         };
