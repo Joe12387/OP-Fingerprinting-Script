@@ -140,7 +140,7 @@ const fingerprint = (): Promise<{
       },
       devicePixelRatio: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isChrome() && !isBrave()) resolve([-2, null]);
+          // if (isChrome() && !isBrave()) resolve([-2, null]);
           const dpr = window.devicePixelRatio;
           if (dpr === undefined) {
             resolve([-1, null]);
@@ -168,7 +168,7 @@ const fingerprint = (): Promise<{
       },
       hardwareConcurrency: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isBrave() /*|| isFirefoxResistFingerprinting()*/) {
+          if (isBrave()) {
             return resolve([-2, null]);
           }
           const hc = navigator.hardwareConcurrency;
@@ -342,8 +342,8 @@ const fingerprint = (): Promise<{
       },
       screenResolution: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          if (isChrome() && !isBrave()) resolve([-2, null]);
-          resolve([0, [screen.width, screen.height].join("x")]);
+          if (isBrave()) resolve([-2, null]);
+          resolve([0, [screen.width || 0, screen.height || 0]]);
         });
       },
       jsHeapSizeLimit: (): Promise<[number, any]> => {
@@ -1046,7 +1046,7 @@ const fingerprint = (): Promise<{
           });
           setTimeout(() => {
             if (ips.length == 0) {
-              resolve([-1, []]);
+              resolve([-1, null]);
             } else {
               resolve([0, ips]);
             }
