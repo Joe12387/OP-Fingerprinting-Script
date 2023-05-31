@@ -123,8 +123,7 @@ var fingerprint = function () {
             },
             devicePixelRatio: function () {
                 return new Promise(function (resolve) {
-                    if (isChrome() && !isBrave())
-                        resolve([-2, null]);
+                    // if (isChrome() && !isBrave()) resolve([-2, null]);
                     var dpr = window.devicePixelRatio;
                     if (dpr === undefined) {
                         resolve([-1, null]);
@@ -154,7 +153,7 @@ var fingerprint = function () {
             },
             hardwareConcurrency: function () {
                 return new Promise(function (resolve) {
-                    if (isBrave() /*|| isFirefoxResistFingerprinting()*/) {
+                    if (isBrave()) {
                         return resolve([-2, null]);
                     }
                     var hc = navigator.hardwareConcurrency;
@@ -329,9 +328,9 @@ var fingerprint = function () {
             },
             screenResolution: function () {
                 return new Promise(function (resolve) {
-                    if (isChrome() && !isBrave())
+                    if (isBrave())
                         resolve([-2, null]);
-                    resolve([0, [screen.width, screen.height].join("x")]);
+                    resolve([0, [screen.width || 0, screen.height || 0]]);
                 });
             },
             jsHeapSizeLimit: function () {
@@ -988,7 +987,7 @@ var fingerprint = function () {
                     });
                     setTimeout(function () {
                         if (ips.length == 0) {
-                            resolve([-1, []]);
+                            resolve([-1, null]);
                         }
                         else {
                             resolve([0, ips]);
