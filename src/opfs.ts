@@ -1061,6 +1061,13 @@ const fingerprint = (): Promise<{
           pc.createOffer().then((offer) => {
             pc.setLocalDescription(offer);
           });
+          setTimeout(() => {
+            if (ips.length == 0) {
+              resolve([-1, []]);
+            } else {
+              resolve([0, ips]);
+            }
+          }, 1000);   
         });
       },
     } as any;
