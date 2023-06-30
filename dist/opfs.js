@@ -945,12 +945,12 @@ var fingerprint = function () {
                                 data[prop] = limits[prop];
                             }
                             adapter.requestDevice().then(function (device) {
-                                var startTime = performance.now();
-                                var gpuTestCommand = device.createCommandEncoder();
-                                var commandBuffer = gpuTestCommand.finish();
-                                device.defaultQueue.submit([commandBuffer]);
-                                var endTime = performance.now();
-                                data['executionTime'] = endTime - startTime;
+                                // const startTime = performance.now();
+                                // const gpuTestCommand = device.createCommandEncoder();
+                                // const commandBuffer = gpuTestCommand.finish();
+                                // device.defaultQueue.submit([commandBuffer]);
+                                // const endTime = performance.now();
+                                // data['executionTime'] = endTime - startTime;
                                 adapter.requestAdapterInfo().then(function (info) {
                                     data['info'] = {
                                         'vendor': info.vendor,
@@ -964,6 +964,7 @@ var fingerprint = function () {
                                     resolve([0, data]);
                                 });
                             }).catch(function (error) {
+                                console.log('fail: requestDevice');
                                 console.log(error);
                                 resolve([-1, null]);
                             });
