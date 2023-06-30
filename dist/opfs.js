@@ -940,14 +940,34 @@ var fingerprint = function () {
                     if ('gpu' in navigator) {
                         navigator.gpu.requestAdapter().then(function (adapter) {
                             var _a = adapter || {}, _b = _a.limits, limits = _b === void 0 ? {} : _b, _c = _a.features, features = _c === void 0 ? [] : _c;
-                            adapter.requestAdapterInfo().then(function (info) {
-                                var data = {};
-                                for (var prop in limits) {
-                                    data[prop] = limits[prop];
-                                }
-                                data = murmurhash3_32_gc(JSON.stringify(data), 420);
-                                resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
+                            var data = {};
+                            for (var prop in limits) {
+                                data[prop] = limits[prop];
+                            }
+                            adapter.requestDevice().then(function (device) {
+                                var startTime = performance.now();
+                                var gpuTestCommand = device.createCommandEncoder();
+                                var commandBuffer = gpuTestCommand.finish();
+                                device.defaultQueue.submit([commandBuffer]);
+                                var endTime = performance.now();
+                                data['executionTime'] = endTime - startTime;
+                                adapter.requestAdapterInfo().then(function (info) {
+                                    data['info'] = {
+                                        'vendor': info.vendor,
+                                        'architecture': info.architecture,
+                                        'device': info.device,
+                                        'description': info.description
+                                    };
+                                    data['features'] = features;
+                                    data['limits'] = limits;
+                                    // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                                    resolve([0, data]);
+                                });
+                            }).catch(function () {
+                                resolve([-1, null]);
                             });
+                        }).catch(function () {
+                            resolve([-1, null]);
                         });
                     }
                     else {
@@ -992,7 +1012,7 @@ var fingerprint = function () {
                         else {
                             resolve([0, ips]);
                         }
-                    }, 1000);
+                    }, 500);
                 });
             },
         };
