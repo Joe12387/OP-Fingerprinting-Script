@@ -940,37 +940,19 @@ var fingerprint = function () {
                     if ('gpu' in navigator) {
                         navigator.gpu.requestAdapter().then(function (adapter) {
                             var _a = adapter || {}, _b = _a.limits, limits = _b === void 0 ? {} : _b, _c = _a.features, features = _c === void 0 ? [] : _c;
-                            var data = {};
-                            for (var prop in limits) {
-                                data[prop] = limits[prop];
-                            }
-                            adapter.requestDevice().then(function (device) {
-                                // const startTime = performance.now();
-                                // const gpuTestCommand = device.createCommandEncoder();
-                                // const commandBuffer = gpuTestCommand.finish();
-                                // device.defaultQueue.submit([commandBuffer]);
-                                // const endTime = performance.now();
-                                // data['executionTime'] = endTime - startTime;
-                                adapter.requestAdapterInfo().then(function (info) {
-                                    data['info'] = {
-                                        'vendor': info.vendor,
-                                        'architecture': info.architecture,
-                                        'device': info.device,
-                                        'description': info.description
-                                    };
-                                    data['features'] = features;
-                                    data['limits'] = limits;
-                                    // data = murmurhash3_32_gc(JSON.stringify(data), 420);
-                                    resolve([0, data]);
-                                });
-                            }).catch(function (error) {
-                                console.log('fail: requestDevice');
-                                console.log(error);
-                                resolve([-1, null]);
+                            adapter.requestAdapterInfo().then(function (info) {
+                                var data = {};
+                                data['info'] = {
+                                    'vendor': info.vendor,
+                                    'architecture': info.architecture,
+                                    'device': info.device,
+                                    'description': info.description
+                                };
+                                data['features'] = features;
+                                data['limits'] = limits;
+                                // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                                resolve([0, data]);
                             });
-                        }).catch(function () {
-                            console.log('fail: requestAdapter');
-                            resolve([-1, null]);
                         });
                     }
                     else {

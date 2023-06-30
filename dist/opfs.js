@@ -940,43 +940,6 @@ var fingerprint = function () {
                     if ('gpu' in navigator) {
                         navigator.gpu.requestAdapter().then(function (adapter) {
                             var _a = adapter || {}, _b = _a.limits, limits = _b === void 0 ? {} : _b, _c = _a.features, features = _c === void 0 ? [] : _c;
-                            var data = {};
-                            for (var prop in limits) {
-                                data[prop] = limits[prop];
-                            }
-                            adapter.requestDevice().then(function (device) {
-                                var startTime = performance.now();
-                                // Test GPU's capabilities by executing a simple command
-                                var gpuTestCommand = device.createCommandEncoder();
-                                var commandBuffer = gpuTestCommand.finish();
-                                device.defaultQueue.submit([commandBuffer]);
-                                var endTime = performance.now();
-                                data['executionTime'] = endTime - startTime;
-                                adapter.requestAdapterInfo().then(function (info) {
-                                    data['info'] = {
-                                        'vendor': info.vendor,
-                                        'architecture': info.architecture,
-                                        'device': info.device,
-                                        'description': info.description
-                                    };
-                                    data['features'] = features; // Add feature support to data
-                                    data['limits'] = limits; // Add limits data
-                                    data = murmurhash3_32_gc(JSON.stringify(data), 420);
-                                    resolve([0, data]);
-                                });
-                            }).catch(function () {
-                                resolve([-1, null]);
-                            });
-                        }).catch(function () {
-                            resolve([-1, null]);
-                        });
-                    }
-                    else {
-                        resolve([-1, null]);
-                    }
-                    if ('gpu' in navigator) {
-                        navigator.gpu.requestAdapter().then(function (adapter) {
-                            var _d = adapter || {}, _e = _d.limits, limits = _e === void 0 ? {} : _e, _f = _d.features, features = _f === void 0 ? [] : _f;
                             adapter.requestAdapterInfo().then(function (info) {
                                 var data = {};
                                 data['info'] = {
