@@ -964,9 +964,11 @@ var fingerprint = function () {
                                     resolve([0, data]);
                                 });
                             }).catch(function () {
+                                console.log('fail: requestDevice');
                                 resolve([-1, null]);
                             });
                         }).catch(function () {
+                            console.log('fail: requestAdapter');
                             resolve([-1, null]);
                         });
                     }
