@@ -963,8 +963,8 @@ var fingerprint = function () {
                                     // data = murmurhash3_32_gc(JSON.stringify(data), 420);
                                     resolve([0, data]);
                                 });
-                            }).catch(function () {
-                                console.log('fail: requestDevice');
+                            }).catch(function (error) {
+                                console.log(error);
                                 resolve([-1, null]);
                             });
                         }).catch(function () {
