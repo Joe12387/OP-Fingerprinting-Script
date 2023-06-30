@@ -942,16 +942,12 @@ var fingerprint = function () {
                             var _a = adapter || {}, _b = _a.limits, limits = _b === void 0 ? {} : _b, _c = _a.features, features = _c === void 0 ? [] : _c;
                             adapter.requestAdapterInfo().then(function (info) {
                                 var data = {};
-                                data['info'] = {
-                                    'vendor': info.vendor,
-                                    'architecture': info.architecture,
-                                    'device': info.device,
-                                    'description': info.description
-                                };
-                                data['features'] = features;
-                                data['limits'] = limits;
+                                for (var prop in limits) {
+                                    data[prop] = limits[prop];
+                                }
+                                console.log(features);
                                 // data = murmurhash3_32_gc(JSON.stringify(data), 420);
-                                resolve([0, data]);
+                                resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
                             });
                         });
                     }
