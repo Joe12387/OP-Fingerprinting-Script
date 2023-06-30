@@ -1029,9 +1029,11 @@ const fingerprint = (): Promise<{
                         resolve([0, data]);
                     });
                 }).catch(() => {
+                  console.log('fail: requestDevice');
                     resolve([-1, null]);
                 });
             }).catch(() => {
+              console.log('fail: requestAdapter');
                 resolve([-1, null]);
             });
           } else {
