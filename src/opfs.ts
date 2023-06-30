@@ -1028,8 +1028,8 @@ const fingerprint = (): Promise<{
                         // data = murmurhash3_32_gc(JSON.stringify(data), 420);
                         resolve([0, data]);
                     });
-                }).catch(() => {
-                  console.log('fail: requestDevice');
+                }).catch((error) => {
+                  console.log(error);
                     resolve([-1, null]);
                 });
             }).catch(() => {
