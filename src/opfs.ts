@@ -999,16 +999,40 @@ const fingerprint = (): Promise<{
       webgpu: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if ('gpu' in navigator) {
-            (navigator.gpu as any).requestAdapter().then((adapter) => {
+            (navigator.gpu as any).requestAdapter().then(function (adapter) {
               const { limits = {}, features = [] } = adapter || {};
-              adapter.requestAdapterInfo().then((info: any) => {
+
                 let data = {};
-                for (const prop in limits) {
-                 data[prop] = limits[prop]
+                for (let prop in limits) {
+                    data[prop] = limits[prop];
                 }
-                data = murmurhash3_32_gc(JSON.stringify(data), 420);
-                resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
-              });
+
+                adapter.requestDevice().then(device => {
+                    const startTime = performance.now();
+                    const gpuTestCommand = device.createCommandEncoder();
+                    const commandBuffer = gpuTestCommand.finish();
+                    device.defaultQueue.submit([commandBuffer]);
+                    const endTime = performance.now();
+                    data['executionTime'] = endTime - startTime;
+
+                    adapter.requestAdapterInfo().then(function (info) {
+                        data['info'] = {
+                            'vendor': info.vendor,
+                            'architecture': info.architecture,
+                            'device': info.device,
+                            'description': info.description
+                        };
+                        data['features'] = features;
+                        data['limits'] = limits;
+
+                        // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                        resolve([0, data]);
+                    });
+                }).catch(() => {
+                    resolve([-1, null]);
+                });
+            }).catch(() => {
+                resolve([-1, null]);
             });
           } else {
             resolve([-1, null]);
@@ -1024,7 +1048,6 @@ const fingerprint = (): Promise<{
               }
             ]
           });
-      
           let ips: string[] = [];
           pc.onicecandidate = (event) => {
             if (event.candidate && event.candidate.candidate) {
@@ -1050,7 +1073,7 @@ const fingerprint = (): Promise<{
             } else {
               resolve([0, ips]);
             }
-          }, 1000);   
+          }, 500);   
         });
       },
     } as any;
