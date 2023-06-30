@@ -999,21 +999,16 @@ const fingerprint = (): Promise<{
       webgpu: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if ('gpu' in navigator) {
-            (navigator.gpu as any).requestAdapter().then((adapter: any) => {
+            (navigator.gpu as any).requestAdapter().then((adapter) => {
               const { limits = {}, features = [] } = adapter || {};
               adapter.requestAdapterInfo().then((info: any) => {
                 let data = {};
-                data['info'] = {
-                  'vendor': info.vendor,
-                  'architecture': info.architecture,
-                  'device': info.device,
-                  'description': info.description
-                };
-                data['features'] = features;
-                data['limits'] = limits;
-
+                for (const prop in limits) {
+                 data[prop] = limits[prop]
+                }
+                console.log(features);
                 // data = murmurhash3_32_gc(JSON.stringify(data), 420);
-                resolve([0, data]);
+                resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
               });
             });
           } else {
