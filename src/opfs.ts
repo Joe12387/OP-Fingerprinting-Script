@@ -1008,12 +1008,12 @@ const fingerprint = (): Promise<{
                 }
 
                 adapter.requestDevice().then(device => {
-                    const startTime = performance.now();
-                    const gpuTestCommand = device.createCommandEncoder();
-                    const commandBuffer = gpuTestCommand.finish();
-                    device.defaultQueue.submit([commandBuffer]);
-                    const endTime = performance.now();
-                    data['executionTime'] = endTime - startTime;
+                    // const startTime = performance.now();
+                    // const gpuTestCommand = device.createCommandEncoder();
+                    // const commandBuffer = gpuTestCommand.finish();
+                    // device.defaultQueue.submit([commandBuffer]);
+                    // const endTime = performance.now();
+                    // data['executionTime'] = endTime - startTime;
 
                     adapter.requestAdapterInfo().then(function (info) {
                         data['info'] = {
@@ -1029,6 +1029,7 @@ const fingerprint = (): Promise<{
                         resolve([0, data]);
                     });
                 }).catch((error) => {
+                  console.log('fail: requestDevice');
                   console.log(error);
                     resolve([-1, null]);
                 });
