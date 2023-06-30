@@ -945,12 +945,13 @@ var fingerprint = function () {
                                 data[prop] = limits[prop];
                             }
                             adapter.requestDevice().then(function (device) {
-                                // const startTime = performance.now();
-                                // const gpuTestCommand = device.createCommandEncoder();
-                                // const commandBuffer = gpuTestCommand.finish();
-                                // device.defaultQueue.submit([commandBuffer]);
-                                // const endTime = performance.now();
-                                // data['executionTime'] = endTime - startTime;
+                                var startTime = performance.now();
+                                // Test GPU's capabilities by executing a simple command
+                                var gpuTestCommand = device.createCommandEncoder();
+                                var commandBuffer = gpuTestCommand.finish();
+                                device.defaultQueue.submit([commandBuffer]);
+                                var endTime = performance.now();
+                                data['executionTime'] = endTime - startTime;
                                 adapter.requestAdapterInfo().then(function (info) {
                                     data['info'] = {
                                         'vendor': info.vendor,
@@ -958,19 +959,37 @@ var fingerprint = function () {
                                         'device': info.device,
                                         'description': info.description
                                     };
-                                    data['features'] = features;
-                                    data['limits'] = limits;
-                                    // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                                    data['features'] = features; // Add feature support to data
+                                    data['limits'] = limits; // Add limits data
+                                    data = murmurhash3_32_gc(JSON.stringify(data), 420);
                                     resolve([0, data]);
                                 });
-                            }).catch(function (error) {
-                                console.log('fail: requestDevice');
-                                console.log(error);
+                            }).catch(function () {
                                 resolve([-1, null]);
                             });
                         }).catch(function () {
-                            console.log('fail: requestAdapter');
                             resolve([-1, null]);
+                        });
+                    }
+                    else {
+                        resolve([-1, null]);
+                    }
+                    if ('gpu' in navigator) {
+                        navigator.gpu.requestAdapter().then(function (adapter) {
+                            var _d = adapter || {}, _e = _d.limits, limits = _e === void 0 ? {} : _e, _f = _d.features, features = _f === void 0 ? [] : _f;
+                            adapter.requestAdapterInfo().then(function (info) {
+                                var data = {};
+                                data['info'] = {
+                                    'vendor': info.vendor,
+                                    'architecture': info.architecture,
+                                    'device': info.device,
+                                    'description': info.description
+                                };
+                                data['features'] = features;
+                                data['limits'] = limits;
+                                // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                                resolve([0, data]);
+                            });
                         });
                     }
                     else {
