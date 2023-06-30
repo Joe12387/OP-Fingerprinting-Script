@@ -999,8 +999,8 @@ const fingerprint = (): Promise<{
       webgpu: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           if ('gpu' in navigator) {
-            (navigator.gpu as any).requestAdapter().then(function (adapter) {
-              const { limits = {}, features = [] } = adapter || {};
+            navigator.gpu.requestAdapter().then(function (adapter) {
+                const _a = adapter || {}, _b = _a.limits, limits = _b === void 0 ? {} : _b, _c = _a.features, features = _c === void 0 ? [] : _c;
 
                 let data = {};
                 for (let prop in limits) {
@@ -1008,12 +1008,13 @@ const fingerprint = (): Promise<{
                 }
 
                 adapter.requestDevice().then(device => {
-                    // const startTime = performance.now();
-                    // const gpuTestCommand = device.createCommandEncoder();
-                    // const commandBuffer = gpuTestCommand.finish();
-                    // device.defaultQueue.submit([commandBuffer]);
-                    // const endTime = performance.now();
-                    // data['executionTime'] = endTime - startTime;
+                    const startTime = performance.now();
+                    // Test GPU's capabilities by executing a simple command
+                    const gpuTestCommand = device.createCommandEncoder();
+                    const commandBuffer = gpuTestCommand.finish();
+                    device.defaultQueue.submit([commandBuffer]);
+                    const endTime = performance.now();
+                    data['executionTime'] = endTime - startTime;
 
                     adapter.requestAdapterInfo().then(function (info) {
                         data['info'] = {
@@ -1022,20 +1023,39 @@ const fingerprint = (): Promise<{
                             'device': info.device,
                             'description': info.description
                         };
-                        data['features'] = features;
-                        data['limits'] = limits;
+                        data['features'] = features;  // Add feature support to data
+                        data['limits'] = limits;  // Add limits data
 
-                        // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                        data = murmurhash3_32_gc(JSON.stringify(data), 420);
                         resolve([0, data]);
                     });
-                }).catch((error) => {
-                  console.log('fail: requestDevice');
-                  console.log(error);
+                }).catch(() => {
                     resolve([-1, null]);
                 });
             }).catch(() => {
-              console.log('fail: requestAdapter');
                 resolve([-1, null]);
+            });
+        }
+        else {
+            resolve([-1, null]);
+        }
+          if ('gpu' in navigator) {
+            (navigator.gpu as any).requestAdapter().then((adapter: any) => {
+              const { limits = {}, features = [] } = adapter || {};
+              adapter.requestAdapterInfo().then((info: any) => {
+                let data = {};
+                data['info'] = {
+                  'vendor': info.vendor,
+                  'architecture': info.architecture,
+                  'device': info.device,
+                  'description': info.description
+                };
+                data['features'] = features;
+                data['limits'] = limits;
+
+                // data = murmurhash3_32_gc(JSON.stringify(data), 420);
+                resolve([0, data]);
+              });
             });
           } else {
             resolve([-1, null]);
