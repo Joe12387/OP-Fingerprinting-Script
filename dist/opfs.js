@@ -883,38 +883,69 @@ var fingerprint = function () {
             },
             math: function () {
                 return new Promise(function (resolve) {
-                    var m = Math;
-                    var returnZero = function () {
-                        return 0;
-                    };
-                    var e = 1e154;
-                    var fp = [
-                        (m.acos || returnZero)(.12312423423423424),
-                        (m.acosh || returnZero)(1e308),
-                        (m.log(e + m.sqrt(e * e - 1))),
-                        (m.asin || returnZero)(.12312423423423424),
-                        (m.asinh || returnZero)(1),
-                        m.log(m.sqrt(2) + 1),
-                        (m.atanh || returnZero)(.5),
-                        m.log(3) / 2,
-                        (m.atan || returnZero)(.5),
-                        (m.sin || returnZero)(-1e300),
-                        (m.sinh || returnZero)(1),
-                        m.exp(1) - 1 / m.exp(1) / 2,
-                        (m.cos || returnZero)(10.000000000123),
-                        (m.cosh || returnZero)(1),
-                        (m.exp(1) + 1 / m.exp(1)) / 2,
-                        (m.tan || returnZero)(-1e300),
-                        (m.tanh || returnZero)(1),
-                        (m.exp(2) - 1) / (m.exp(2) + 1),
-                        (m.exp || returnZero)(1),
-                        (m.expm1 || returnZero)(1),
-                        m.exp(1) - 1,
-                        (m.log1p || returnZero)(10),
-                        m.log(11),
-                        m.pow(m.PI, -100),
-                    ];
-                    resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
+                    function checkMathFeature(feature, fallback) {
+                        if (fallback === void 0) { fallback = function () { return 0; }; }
+                        return Math[feature] ? function (arg) { return Math[feature](arg); } : fallback;
+                    }
+                    function calculateMathOperations() {
+                        var e = 1e154;
+                        return [
+                            checkMathFeature('acos')(0.12312423423423424),
+                            checkMathFeature('acosh')(1e308),
+                            Math.log(e + Math.sqrt(e * e - 1)),
+                            checkMathFeature('asin')(0.12312423423423424),
+                            checkMathFeature('asinh')(1),
+                            Math.log(Math.sqrt(2) + 1),
+                            checkMathFeature('atanh')(0.5),
+                            Math.log(3) / 2,
+                            checkMathFeature('atan')(0.5),
+                            checkMathFeature('sin')(-1e300),
+                            checkMathFeature('sinh')(1),
+                            Math.exp(1) - 1 / Math.exp(1) / 2,
+                            checkMathFeature('cos')(10.000000000123),
+                            checkMathFeature('cosh')(1),
+                            (Math.exp(1) + 1 / Math.exp(1)) / 2,
+                            checkMathFeature('tan')(-1e300),
+                            checkMathFeature('tanh')(1),
+                            (Math.exp(2) - 1) / (Math.exp(2) + 1),
+                            checkMathFeature('exp')(1),
+                            checkMathFeature('expm1')(1),
+                            Math.exp(1) - 1,
+                            checkMathFeature('log1p')(10),
+                            Math.log(11),
+                            Math.pow(Math.PI, -100),
+                            Math.pow(Math.E, 2),
+                            Math.sqrt(Math.PI),
+                            checkMathFeature('log2')(64),
+                            checkMathFeature('log10')(1000),
+                            checkMathFeature('cbrt')(27),
+                            Math.sign(-Infinity),
+                            checkMathFeature('trunc')(Math.PI),
+                            Math.round(Math.E),
+                            Math.floor(Math.PI),
+                            Math.ceil(Math.E),
+                            Math.sin(Math.PI / 2),
+                            Math.cos(Math.PI),
+                            Math.tan(Math.PI / 4),
+                            Math.asin(1),
+                            Math.acos(0),
+                            Math.atan(1),
+                            checkMathFeature('sinh')(Math.PI / 2),
+                            checkMathFeature('cosh')(Math.PI / 2),
+                            checkMathFeature('tanh')(Math.PI / 4),
+                            Math.hypot(3, 4, 12),
+                            Math.max(Math.PI, Math.E),
+                            Math.min(Math.PI, Math.E),
+                        ];
+                    }
+                    try {
+                        var mathResults = calculateMathOperations();
+                        var hash = murmurhash3_32_gc(JSON.stringify(mathResults), 420);
+                        resolve([0, hash]);
+                    }
+                    catch (error) {
+                        resolve([-1, null]);
+                    }
                 });
             },
             notifications: function () {

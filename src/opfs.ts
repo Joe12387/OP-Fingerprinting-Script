@@ -938,63 +938,91 @@ const fingerprint = (): Promise<{
       installTrigger: (): Promise<[number, boolean]> => {
         return Promise.resolve([0, (window as any).InstallTrigger !== undefined]);
       },
-      math: (): Promise<[number, number]> => {
+      math: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
-          const m = Math;
-
-          const returnZero = (): number => {
-            return 0;
-          };
-
-          const e = 1e154;
+          function checkMathFeature(feature: string, fallback = () => 0) {
+            return Math[feature] ? (arg) => Math[feature](arg) : fallback;
+          }
       
-          const fp = [
-            (m.acos || returnZero)(.12312423423423424),
-            (m.acosh || returnZero)(1e308),
-            (m.log(e + m.sqrt(e * e - 1))),
-            (m.asin || returnZero)(.12312423423423424),
-            (m.asinh || returnZero)(1),
-            m.log(m.sqrt(2) + 1),
-            (m.atanh || returnZero)(.5),
-            m.log(3) / 2,
-            (m.atan || returnZero)(.5),
-            (m.sin || returnZero)(-1e300),
-            (m.sinh || returnZero)(1),
-            m.exp(1) - 1 / m.exp(1) / 2,
-            (m.cos || returnZero)(10.000000000123),
-            (m.cosh || returnZero)(1),
-            (m.exp(1) + 1 / m.exp(1)) / 2,
-            (m.tan || returnZero)(-1e300),
-            (m.tanh || returnZero)(1),
-            (m.exp(2) - 1) / (m.exp(2) + 1),
-            (m.exp || returnZero)(1),
-            (m.expm1 || returnZero)(1),
-            m.exp(1) - 1,
-            (m.log1p || returnZero)(10),
-            m.log(11),
-            m.pow(m.PI, -100),
-          ];
+          function calculateMathOperations() {
+            const e = 1e154;
       
-          resolve([0, murmurhash3_32_gc(JSON.stringify(fp), 420)]);
+            return [
+              checkMathFeature('acos')(0.12312423423423424),
+              checkMathFeature('acosh')(1e308),
+              Math.log(e + Math.sqrt(e * e - 1)),
+              checkMathFeature('asin')(0.12312423423423424),
+              checkMathFeature('asinh')(1),
+              Math.log(Math.sqrt(2) + 1),
+              checkMathFeature('atanh')(0.5),
+              Math.log(3) / 2,
+              checkMathFeature('atan')(0.5),
+              checkMathFeature('sin')(-1e300),
+              checkMathFeature('sinh')(1),
+              Math.exp(1) - 1 / Math.exp(1) / 2,
+              checkMathFeature('cos')(10.000000000123),
+              checkMathFeature('cosh')(1),
+              (Math.exp(1) + 1 / Math.exp(1)) / 2,
+              checkMathFeature('tan')(-1e300),
+              checkMathFeature('tanh')(1),
+              (Math.exp(2) - 1) / (Math.exp(2) + 1),
+              checkMathFeature('exp')(1),
+              checkMathFeature('expm1')(1),
+              Math.exp(1) - 1,
+              checkMathFeature('log1p')(10),
+              Math.log(11),
+              Math.pow(Math.PI, -100),
+              Math.pow(Math.E, 2),
+              Math.sqrt(Math.PI),
+              checkMathFeature('log2')(64),
+              checkMathFeature('log10')(1000),
+              checkMathFeature('cbrt')(27),
+              Math.sign(-Infinity),
+              checkMathFeature('trunc')(Math.PI),
+              Math.round(Math.E),
+              Math.floor(Math.PI),
+              Math.ceil(Math.E),
+              Math.sin(Math.PI / 2),
+              Math.cos(Math.PI),
+              Math.tan(Math.PI / 4),
+              Math.asin(1),
+              Math.acos(0),
+              Math.atan(1),
+              checkMathFeature('sinh')(Math.PI / 2),
+              checkMathFeature('cosh')(Math.PI / 2),
+              checkMathFeature('tanh')(Math.PI / 4),
+              Math.hypot(3, 4, 12),
+              Math.max(Math.PI, Math.E),
+              Math.min(Math.PI, Math.E),
+            ];
+          }
+            
+          try {
+            const mathResults = calculateMathOperations();
+            const hash = murmurhash3_32_gc(JSON.stringify(mathResults), 420);
+            resolve([0, hash]);
+          } catch (error) {
+            resolve([-1, null]);
+          }
         });
       },
       notifications: (): Promise<[number, any]> => {
-          return new Promise((resolve): void => {
-            if (window.Notification === undefined) {
-              resolve([-1, null]);
-            }
-            if (navigator.permissions === undefined) {
-              resolve([-2, null]);
-            }
-            if (typeof navigator.permissions.query !== "function") {
-              resolve([-3, null]);
-            }
-            navigator.permissions.query({name: "notifications"}).then((res): void => {
-              resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
-            }).catch((res): void => {
-              resolve([-4, null]);
-            });
+        return new Promise((resolve): void => {
+          if (window.Notification === undefined) {
+            resolve([-1, null]);
+          }
+          if (navigator.permissions === undefined) {
+            resolve([-2, null]);
+          }
+          if (typeof navigator.permissions.query !== "function") {
+            resolve([-3, null]);
+          }
+          navigator.permissions.query({name: "notifications"}).then((res): void => {
+            resolve([0, window.Notification.permission === "denied" && res.state === "prompt"]);
+          }).catch((res): void => {
+            resolve([-4, null]);
           });
+        });
       },
       webgpu: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
