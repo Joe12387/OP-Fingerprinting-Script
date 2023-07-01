@@ -1,10 +1,25 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 /**
  *
  * Overpowered Browser Fingerprinting Script v1.0.2 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
  *
  **/
-var fingerprint = function () {
+var fingerprint = function (requested_config) {
+    if (requested_config === void 0) { requested_config = {}; }
+    var default_config = { webrtc: false };
+    var config = __assign(__assign({}, default_config), requested_config);
+    console.log(config);
     function murmurhash3_32_gc(key, seed) {
         var remainder = key.length & 3;
         var bytes = key.length - remainder;
@@ -989,6 +1004,8 @@ var fingerprint = function () {
             },
             webrtc: function () {
                 return new Promise(function (resolve) {
+                    if (!config.webrtc)
+                        resolve([-2, null]);
                     var pc = new RTCPeerConnection({
                         iceServers: [
                             {
