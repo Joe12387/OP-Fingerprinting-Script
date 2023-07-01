@@ -1070,6 +1070,52 @@ var fingerprint = function (requested_config) {
                     resolve([0, colorValues]);
                 });
             },
+            features: function () {
+                return new Promise(function (resolve) {
+                    var properties = [
+                        'navigator.credentials',
+                        'navigator.appMinorVersion',
+                        'navigator.bluetooth',
+                        'navigator.storage',
+                        'Math.imul',
+                        'navigator.getGamepads',
+                        'navigator.getStorageUpdates',
+                        'navigator.hardwareConcurrency',
+                        'navigator.mediaDevices',
+                        'navigator.mozAlarms',
+                        'navigator.mozConnection',
+                        'navigator.mozIsLocallyAvailable',
+                        'navigator.mozPhoneNumberService',
+                        'navigator.msManipulationViewsEnabled',
+                        'navigator.permissions',
+                        'navigator.registerProtocolHandler',
+                        'navigator.requestMediaKeySystemAccess',
+                        'navigator.requestWakeLock',
+                        'navigator.sendBeacon',
+                        'navigator.serviceWorker',
+                        'navigator.storeWebWideTrackingException',
+                        'navigator.webkitGetGamepads',
+                        'navigator.webkitTemporaryStorage',
+                        'Number.parseInt',
+                        'Math.hypot',
+                    ];
+                    function evaluateProperty(propString) {
+                        var path = propString.split('.');
+                        var obj = window;
+                        for (var i = 0; i < path.length; i++) {
+                            obj = obj[path[i]];
+                            if (obj === undefined || obj === null) {
+                                return false;
+                            }
+                        }
+                        return Boolean(obj);
+                    }
+                    var fp = properties.reduce(function (acc, prop, index) {
+                        return acc + (+evaluateProperty(prop) << index);
+                    }, 0);
+                    resolve([0, fp]);
+                });
+            },
         };
         var index = [];
         var promises = [];
