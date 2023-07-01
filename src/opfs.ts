@@ -1034,7 +1034,7 @@ const fingerprint = (): Promise<{
                 for (const prop in limits) {
                  data[prop] = limits[prop]
                 }
-                console.log(features);
+                // console.log(features);
                 // data = murmurhash3_32_gc(JSON.stringify(data), 420);
                 resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
               });
@@ -1079,6 +1079,38 @@ const fingerprint = (): Promise<{
               resolve([0, ips]);
             }
           }, 500);   
+        });
+      },
+      systemColors: (): Promise<[number, any]> => {
+        return new Promise((resolve): void => {
+            const systemColors = [
+                "ActiveBorder", "ActiveCaption", "ActiveText", "AppWorkspace", "Background",
+                "ButtonBorder", "ButtonFace", "ButtonHighlight", "ButtonShadow", "ButtonText",
+                "Canvas", "CanvasText", "CaptionText", "Field", "FieldText", "GrayText",
+                "Highlight", "HighlightText", "InactiveBorder", "InactiveCaption",
+                "InactiveCaptionText", "InfoBackground", "InfoText", "LinkText", "Mark",
+                "MarkText", "Menu", "MenuText", "Scrollbar", "ThreeDDarkShadow", "ThreeDFace",
+                "ThreeDHighlight", "ThreeDLightShadow", "ThreeDShadow", "VisitedText",
+                "Window", "WindowFrame", "WindowText"
+            ];
+        
+            let div = document.createElement("div");
+            div.style.display = "none";
+            document.head.appendChild(div);
+        
+            let colorValues = {};
+        
+            for (let colorName of systemColors) {
+                div.style.backgroundColor = colorName;
+        
+                let computedColor = window.getComputedStyle(div).backgroundColor;
+        
+                colorValues[colorName] = computedColor;
+            }
+        
+            document.head.removeChild(div);
+        
+            resolve([0, colorValues]);
         });
       },
     } as any;
