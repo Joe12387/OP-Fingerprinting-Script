@@ -976,7 +976,7 @@ var fingerprint = function () {
                                 for (var prop in limits) {
                                     data[prop] = limits[prop];
                                 }
-                                console.log(features);
+                                // console.log(features);
                                 // data = murmurhash3_32_gc(JSON.stringify(data), 420);
                                 resolve([0, [info.vendor, info.architecture, info.device, info.description, data]]);
                             });
@@ -1025,6 +1025,32 @@ var fingerprint = function () {
                             resolve([0, ips]);
                         }
                     }, 500);
+                });
+            },
+            systemColors: function () {
+                return new Promise(function (resolve) {
+                    var systemColors = [
+                        "ActiveBorder", "ActiveCaption", "ActiveText", "AppWorkspace", "Background",
+                        "ButtonBorder", "ButtonFace", "ButtonHighlight", "ButtonShadow", "ButtonText",
+                        "Canvas", "CanvasText", "CaptionText", "Field", "FieldText", "GrayText",
+                        "Highlight", "HighlightText", "InactiveBorder", "InactiveCaption",
+                        "InactiveCaptionText", "InfoBackground", "InfoText", "LinkText", "Mark",
+                        "MarkText", "Menu", "MenuText", "Scrollbar", "ThreeDDarkShadow", "ThreeDFace",
+                        "ThreeDHighlight", "ThreeDLightShadow", "ThreeDShadow", "VisitedText",
+                        "Window", "WindowFrame", "WindowText"
+                    ];
+                    var div = document.createElement("div");
+                    div.style.display = "none";
+                    document.head.appendChild(div);
+                    var colorValues = {};
+                    for (var _i = 0, systemColors_1 = systemColors; _i < systemColors_1.length; _i++) {
+                        var colorName = systemColors_1[_i];
+                        div.style.backgroundColor = colorName;
+                        var computedColor = window.getComputedStyle(div).backgroundColor;
+                        colorValues[colorName] = computedColor;
+                    }
+                    document.head.removeChild(div);
+                    resolve([0, colorValues]);
                 });
             },
         };
