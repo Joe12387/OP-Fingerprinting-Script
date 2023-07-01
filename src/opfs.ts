@@ -3,7 +3,7 @@
  * Overpowered Browser Fingerprinting Script v1.0.2 - (c) 2023 Joe Rutkowski <Joe@dreggle.com> (https://github.com/Joe12387/OP-Fingerprinting-Script)
  *
  **/
-const fingerprint = (): Promise<{
+const fingerprint = (requested_config = {}): Promise<{
   fingerprint: number;
   fingerprints: {
     uniqueFp: number;
@@ -11,6 +11,10 @@ const fingerprint = (): Promise<{
   };
   profile: any[];
 }> => {
+  const default_config = {webrtc: false};
+  const config = {...default_config, ...requested_config};
+  console.log(config);
+
   function murmurhash3_32_gc(key: string, seed: number): number {
     const remainder = key.length & 3;
     const bytes = key.length - remainder;
@@ -1046,6 +1050,7 @@ const fingerprint = (): Promise<{
       },
       webrtc: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
+          if (!config.webrtc) resolve([-2, null]);
           const pc = new RTCPeerConnection({
             iceServers: [
               {
