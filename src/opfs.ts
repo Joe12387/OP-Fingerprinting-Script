@@ -610,8 +610,11 @@ const fingerprint = (requested_config = {}): Promise<{
       attributionsourceid: (): Promise<[number, any]> => {
         return new Promise((resolve): void => {
           const a = (document.createElement("a") as any).attributionsourceid;
+          const b = (document.createElement("a") as any).attributionSourceId;
           if (a !== undefined) {
             resolve([0, String(a)]);
+          } else if (b !== undefined) {
+            resolve([1, String(b)]);
           } else {
             resolve([-1, null]);
           }
@@ -1140,7 +1143,7 @@ const fingerprint = (requested_config = {}): Promise<{
             'navigator.requestMediaKeySystemAccess',
             'navigator.requestWakeLock',
             'navigator.sendBeacon',
-            'navigator.serviceWorker',
+            // 'navigator.serviceWorker',
             'navigator.storeWebWideTrackingException',
             'navigator.webkitGetGamepads',
             'navigator.webkitTemporaryStorage',
