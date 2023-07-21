@@ -585,8 +585,12 @@ var fingerprint = function (requested_config) {
             attributionsourceid: function () {
                 return new Promise(function (resolve) {
                     var a = document.createElement("a").attributionsourceid;
+                    var b = document.createElement("a").attributionSourceId;
                     if (a !== undefined) {
                         resolve([0, String(a)]);
+                    }
+                    else if (b !== undefined) {
+                        resolve([1, String(b)]);
                     }
                     else {
                         resolve([-1, null]);
@@ -1092,7 +1096,7 @@ var fingerprint = function (requested_config) {
                         'navigator.requestMediaKeySystemAccess',
                         'navigator.requestWakeLock',
                         'navigator.sendBeacon',
-                        'navigator.serviceWorker',
+                        // 'navigator.serviceWorker',
                         'navigator.storeWebWideTrackingException',
                         'navigator.webkitGetGamepads',
                         'navigator.webkitTemporaryStorage',
