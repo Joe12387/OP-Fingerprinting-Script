@@ -113,3 +113,8 @@ fingerprint().then((result) => {
  
  ## Notes
  * The fingerprint may be inconsistent if the user is on a device that switches graphics hardware such as a MacBook Pro.
+
+ ## Similar Projects
+
+ - [detectIncognito](https://github.com/Joe12387/detectIncognito "detectIncognito")
+ - [Browser Fingerprinting Resistance Research](https://github.com/Joe12387/browser-fingerprinting-resistance-research "Browser Fingerprinting Resistance Research")
