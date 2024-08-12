@@ -1,3 +1,6 @@
+# Notice of Deprecation
+**This project is deprecated. Please see the new project, [OverpoweredJS](https://github.com/Joe12387/overpoweredjs).**
+
 # OP JavaScript Browser Fingerprinting Script
  OPFS is a browser fingerprinting library for creating persistent, unique and long-lasting digital fingerprints without depending on ever-changing variables such as the user agent string commonly used in other browser fingerprinting libraries. As such, the fingerprint does not change most of the time when a user upgrades their browser to the current version.
 
